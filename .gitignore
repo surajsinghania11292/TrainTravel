@@ -165,3 +165,8 @@ serviceAccountKey.json
 # Add service-specific ignores here if needed
 # user-service/uploads/
 # booking-service/temp/
+# Resumes and private documents
+*.pdf
+*resume*
+*Resume*
+

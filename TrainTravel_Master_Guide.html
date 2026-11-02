@@ -1,0 +1,3550 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrainTravel — Distributed Microservices Architecture & Engineering Guide</title>
+  
+  <!-- Google Fonts matching Suraj's Portfolio -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       THEME VARIABLES — Exact matching from Suraj's Portfolio
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-root:         #F0EDE4;
+      --bg-surface:      #E8E4D9;
+      --bg-card:         #FAFAF7;
+      --bg-card-raised:  #FFFFFF;
+      --bg-code:         #192321;
+      --bg-overlay:      rgba(26, 26, 24, 0.65);
+      --nav-bg:          rgba(240, 237, 228, 0.98);
+
+      /* Primary Brand Emerald Accent */
+      --accent:          #004743;
+      --accent-hover:    #005E58;
+      --accent-light:    rgba(0, 71, 67, 0.08);
+      --accent-medium:   rgba(0, 71, 67, 0.16);
+      --accent-strong:   rgba(0, 71, 67, 0.28);
+
+      /* Secondary Warm Gold Accent */
+      --accent2:         #B8860B;
+      --accent2-light:   rgba(184, 134, 11, 0.12);
+
+      /* Status Colors */
+      --color-success:   #0D7B54;
+      --color-warning:   #C05621;
+      --color-danger:    #C53030;
+      --color-info:      #2B6CB0;
+
+      /* Text */
+      --text-primary:    #1A1A18;
+      --text-secondary:  #4A4A44;
+      --text-muted:      #76756D;
+      --text-faint:      #A8A49A;
+
+      /* Borders */
+      --border-faint:    rgba(0, 71, 67, 0.07);
+      --border:          rgba(0, 71, 67, 0.14);
+      --border-strong:   rgba(0, 71, 67, 0.28);
+
+      /* Shadows */
+      --shadow-sm:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:       0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+      --shadow-lg:       0 12px 32px rgba(0, 71, 67, 0.08), 0 4px 12px rgba(0,0,0,0.04);
+
+      /* Typography */
+      --font-display:    'Fraunces', Georgia, serif;
+      --font-sans:       'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono:       'DM Mono', monospace;
+
+      --radius-sm:       6px;
+      --radius-md:       12px;
+      --radius-lg:       18px;
+      --radius-full:     9999px;
+    }
+
+    [data-theme="dark"] {
+      --bg-root:         #0A1C1C;
+      --bg-surface:      #081717;
+      --bg-card:         #102828;
+      --bg-card-raised:  #163333;
+      --bg-code:         #061313;
+      --bg-overlay:      rgba(0, 0, 0, 0.85);
+      --nav-bg:          rgba(10, 28, 28, 0.98);
+
+      --accent:          #E6C79C;
+      --accent-hover:    #F0D4B0;
+      --accent-light:    rgba(230, 199, 156, 0.08);
+      --accent-medium:   rgba(230, 199, 156, 0.16);
+      --accent-strong:   rgba(230, 199, 156, 0.28);
+
+      --accent2:         #7FC8C4;
+      --accent2-light:   rgba(127, 200, 196, 0.12);
+
+      --color-success:   #48BB78;
+      --color-warning:   #ED8936;
+      --color-danger:    #FC8181;
+      --color-info:      #63B3ED;
+
+      --text-primary:    #F5F0E8;
+      --text-secondary:  #C7BFB0;
+      --text-muted:      #8F897D;
+      --text-faint:      #5E5A53;
+
+      --border-faint:    rgba(230, 199, 156, 0.08);
+      --border:          rgba(230, 199, 156, 0.16);
+      --border-strong:   rgba(230, 199, 156, 0.32);
+
+      --shadow-sm:       0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md:       0 4px 16px rgba(0,0,0,0.5);
+      --shadow-lg:       0 12px 32px rgba(0,0,0,0.6);
+    }
+
+    /* ── BASE RESETS ── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--bg-root);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER / NAVIGATION (NON-STICKY: SCROLLS AWAY WITH PAGE) ── */
+    header.site-header {
+      position: relative; /* Not sticky! Natural scroll off-screen as requested */
+      z-index: 50;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .brand-badge {
+      background: var(--accent);
+      color: var(--bg-root);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.15rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-left: 0.5rem;
+      padding-left: 0.5rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.75rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .theme-toggle {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.45rem 0.95rem;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── LAYOUT & CONTAINER ── */
+    .page-wrapper {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 6rem 1.5rem;
+    }
+
+    /* ── HERO BANNER ── */
+    .hero-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem 2.5rem;
+      margin-bottom: 3.5rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      right: -80px;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, var(--accent-light) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid var(--accent-strong);
+      padding: 0.35rem 0.95rem;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    h1.hero-title {
+      font-family: var(--font-display);
+      font-size: 3.2rem;
+      line-height: 1.15;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      letter-spacing: -1px;
+    }
+
+    p.hero-tagline {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 920px;
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    .hero-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-faint);
+      border-radius: var(--radius-md);
+      padding: 1.3rem;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ── SECTION STYLING (CLEAN ANCHOR MARGIN SINCE HEADER IS RELATIVE) ── */
+    section.doc-section {
+      margin-bottom: 4.5rem;
+      scroll-margin-top: 1.8rem; /* Clean alignment without large gaps */
+    }
+
+    .section-header {
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .section-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent2);
+      background: var(--accent2-light);
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+    }
+
+    h2.section-heading {
+      font-family: var(--font-display);
+      font-size: 2.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    p.section-subtext {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+    }
+
+    /* ── TECHNOLOGY BREAKDOWN CARDS ── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .tech-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .tech-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .tech-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.4rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .tech-name-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .tech-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--accent-light);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      border: 1px solid var(--accent-medium);
+    }
+
+    h3.tech-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--text-primary);
+    }
+
+    .tech-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    .explanation-columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .explanation-pane {
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      padding: 1.4rem;
+      border: 1px solid var(--border-faint);
+    }
+
+    .pane-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+    }
+
+    .pane-header.simple { color: var(--color-info); }
+    .pane-header.technical { color: var(--accent2); }
+    .pane-header.project { color: var(--color-success); }
+
+    .explanation-pane p {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    .explanation-pane ul {
+      margin-left: 1.25rem;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .explanation-pane li {
+      margin-bottom: 0.35rem;
+    }
+
+    /* ── ARCHITECTURE DIAGRAM CONTAINER ── */
+    .arch-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 2rem;
+    }
+
+    .diagram-caption {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-top: 1.5rem;
+    }
+
+    /* ── DATA TABLES ── */
+    .ports-table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    table.ports-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    table.ports-table th {
+      background: var(--bg-surface);
+      padding: 0.9rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.5px;
+    }
+
+    table.ports-table td {
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--border-faint);
+      color: var(--text-secondary);
+    }
+
+    table.ports-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.ports-table tr:hover td {
+      background: var(--accent-light);
+    }
+
+    .port-badge {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      border: 1px solid var(--accent-medium);
+    }
+
+    .http-method {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    .http-get { background: rgba(43, 108, 176, 0.15); color: var(--color-info); }
+    .http-post { background: rgba(13, 123, 84, 0.15); color: var(--color-success); }
+    .http-put { background: rgba(184, 134, 11, 0.15); color: var(--accent2); }
+    .http-delete { background: rgba(197, 48, 48, 0.15); color: var(--color-danger); }
+
+    /* ── CODE ACCORDIONS ── */
+    .code-module {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .module-header {
+      padding: 1.25rem 1.75rem;
+      background: var(--bg-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid transparent;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .module-header:hover {
+      background: var(--bg-surface);
+    }
+
+    .code-module.open .module-header {
+      border-bottom-color: var(--border);
+      background: var(--bg-surface);
+    }
+
+    .module-title-area {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .file-path {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .file-role-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .toggle-icon {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+
+    .code-module.open .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .module-body {
+      padding: 1.75rem;
+      display: none;
+    }
+
+    .code-module.open .module-body {
+      display: block;
+    }
+
+    .module-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .meta-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-faint);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.2rem;
+    }
+
+    .meta-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-box p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Code block styling */
+    .code-snippet-wrap {
+      background: var(--bg-code);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      position: relative;
+    }
+
+    .code-snippet-header {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.55rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .code-snippet-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #A8A49A;
+    }
+
+    pre code {
+      display: block;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      color: #E6E1D8;
+      line-height: 1.6;
+      tab-size: 2;
+    }
+
+    .hl-kw { color: #F6AD55; font-weight: 600; }
+    .hl-fn { color: #63B3ED; font-weight: 500; }
+    .hl-str { color: #9AE6B4; }
+    .hl-cmt { color: #718096; font-style: italic; }
+    .hl-num { color: #FAF089; }
+    .hl-typ { color: #BEE3F8; font-weight: 600; }
+
+    /* ── STEP-BY-STEP FUNNEL CARDS ── */
+    .funnel-step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .funnel-step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .funnel-badge {
+      background: var(--accent);
+      color: var(--bg-root);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.4rem;
+      border-radius: var(--radius-md);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .funnel-content h4 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+
+    .funnel-content p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .funnel-tech-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    /* ── INTERVIEW QA CHEAT SHEET ── */
+    .qa-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 1.35rem;
+      padding: 1.6rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .qa-question {
+      font-family: var(--font-display);
+      font-size: 1.22rem;
+      color: var(--accent);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .qa-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--accent-medium);
+    }
+
+    .qa-answer {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .qa-answer strong {
+      color: var(--text-primary);
+    }
+
+    .qa-pro-tip {
+      background: var(--bg-surface);
+      border-left: 3px solid var(--accent2);
+      padding: 0.8rem 1.1rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-top: 0.95rem;
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
+    .qa-pro-tip span {
+      font-weight: 700;
+      color: var(--accent2);
+      font-family: var(--font-mono);
+    }
+
+    /* ── FOOTER ── */
+    footer.site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      margin-top: 5rem;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-text {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      h1.hero-title { font-size: 2.2rem; }
+      .nav-links { display: none; }
+      .explanation-columns { grid-template-columns: 1fr; }
+      .hero-banner { padding: 2rem 1.5rem; }
+      header.site-header { padding: 0.85rem 1rem; }
+      .funnel-step-card { grid-template-columns: 1fr; gap: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── SITE HEADER (NON-STICKY: SCROLLS AWAY NATURALLY) ── -->
+  <header class="site-header">
+    <a href="#" class="brand-block">
+      <div class="brand-badge">TT</div>
+      <div>
+        <span class="brand-title">TrainTravel</span>
+        <span class="brand-subtitle">Distributed Railway Platform · Complete Engineering Walkthrough</span>
+      </div>
+    </a>
+
+    <div class="nav-actions">
+      <ul class="nav-links">
+        <li><a href="#tech-stack">Tech Stack</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#system-design">System Design</a></li>
+        <li><a href="#database-schema">DB Schemas</a></li>
+        <li><a href="#api-catalogue">API Catalogue</a></li>
+        <li><a href="#kafka-streams">Kafka Events</a></li>
+        <li><a href="#booking-lifecycle">Booking Flow</a></li>
+        <li><a href="#codebase">Codebase</a></li>
+        <li><a href="#interview-qa">Interview Q&A</a></li>
+      </ul>
+
+      <button id="themeToggleBtn" class="theme-toggle" aria-label="Toggle Theme">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="page-wrapper">
+
+    <!-- ── HERO SECTION ── -->
+    <div class="hero-banner">
+      <div class="hero-pill">
+        <span class="hero-pill-dot"></span>
+        Production Distributed Microservices Platform · Master Interview Guide
+      </div>
+      <h1 class="hero-title">TrainTravel: Distributed Railway Reservation Engine</h1>
+      <p class="hero-tagline">
+        An enterprise-grade, distributed microservices platform engineered for high-concurrency seat locking, event-driven saga orchestration, dynamic multi-stop route segment seat reuse, and zero double-booking transactional consistency across national railway networks.
+      </p>
+
+      <div class="hero-metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">8 Services</div>
+          <div class="metric-label">Microservices Architecture</div>
+          <div class="metric-desc">Database-per-service pattern with dedicated schemas, unified under an API Gateway with raw-byte webhook validation.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">0 Collisions</div>
+          <div class="metric-label">High-Concurrency Seat Locking</div>
+          <div class="metric-desc">Pessimistic row-level <code>FOR UPDATE NOWAIT</code> with interval segment algebra and advisory lock leader election.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">Saga Pattern</div>
+          <div class="metric-label">Distributed ACID Transactions</div>
+          <div class="metric-desc">Forward orchestrator with automated reverse compensating rollbacks for payment, inventory holds, and refunds.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">&lt; 15 ms</div>
+          <div class="metric-label">Fuzzy Route Search</div>
+          <div class="metric-desc">Elasticsearch 8 cluster with edge n-gram station tokenization and real-time Kafka event bus synchronization.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 1: TECH STACK EXPLAINED
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="tech-stack" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">01</span>
+          <h2 class="section-heading">Technologies Used & Deep Technical Breakdown</h2>
+        </div>
+        <p class="section-subtext">From plain English intuition to distributed system RFC specs and TrainTravel implementation</p>
+      </div>
+
+      <div class="tech-grid">
+
+        <!-- Tech 1: Microservices & API Gateway -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">GW</div>
+              <div>
+                <h3 class="tech-title">Microservices Architecture & API Gateway</h3>
+                <span class="tech-tag">Express · Reverse Proxy · Circuit Breaker · Rate Limiting</span>
+              </div>
+            </div>
+            <span class="tech-tag" style="background: var(--accent-light); color: var(--accent); font-weight:700;">System Perimeter</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>💡</span> Plain English Explanation
+              </div>
+              <p>
+                Imagine a huge shopping mall with specialized shops: a bakery, a shoe store, a jewelry shop, and a security office. Instead of letting shoppers wander into employee backrooms, there is a grand front entrance with a helpful concierge.
+              </p>
+              <p style="margin-top:0.75rem;">
+                The <strong>API Gateway is the concierge</strong>: it checks your ID card (JWT token), makes sure you aren't running in and out 100 times a second (rate limiter), and directs you straight to the exact shop you need.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚙️</span> In-Depth Technical Specification
+              </div>
+              <p>
+                Microservices decompose monolithic state into autonomous domain bounded contexts (DDD):
+              </p>
+              <ul>
+                <li><strong>Single Entrypoint:</strong> The Gateway exposes port <code>4000</code>, decoupling clients from internal service ports and topology.</li>
+                <li><strong>Cross-Cutting Concerns:</strong> Handles central JWT decoding, IP-based sliding window rate limiting, CORS, Helmet security headers, and request logging.</li>
+                <li><strong>Circuit Breaking:</strong> Monitors downstream HTTP latency and error rates, failing fast if a service goes down to prevent cascading thread starvation.</li>
+              </ul>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🎯</span> Exact Role in TrainTravel
+              </div>
+              <p>
+                Located in <code>api-gateway/src</code>. It routes <code>/api/users/*</code> to Port 4001, <code>/api/search/*</code> to 4002, <code>/api/admins/*</code> to 4003, <code>/api/bookings/*</code> to 4005, <code>/api/payments/*</code> to 4006, and <code>/api/inventory/*</code> to 4007.
+              </p>
+              <p style="margin-top:0.5rem;">
+                Crucially, it intercepts Razorpay webhooks to parse raw byte streams for HMAC cryptographic signature verification before routing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech 2: PostgreSQL & Concurrency Locking -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">SQL</div>
+              <div>
+                <h3 class="tech-title">PostgreSQL 15, Prisma ORM & Row Locking</h3>
+                <span class="tech-tag">ACID · FOR UPDATE NOWAIT · Segment Locks · Advisory Locks</span>
+              </div>
+            </div>
+            <span class="tech-tag" style="background: rgba(13, 123, 84, 0.12); color: var(--color-success); font-weight:700;">Zero Double-Bookings</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>💡</span> Plain English Explanation
+              </div>
+              <p>
+                Imagine a train seat has a physical wooden token on the ticket counter. When two travelers rush to grab Seat 14A at the exact same millisecond during a festival rush, only one person's hand touches the token first.
+              </p>
+              <p style="margin-top:0.75rem;">
+                <strong>Database Row-Level Locking</strong> guarantees that the second person is told immediately: <em>"Sorry, someone else just locked this seat!"</em> without causing a fight or double-selling the ticket.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚙️</span> In-Depth Technical Specification
+              </div>
+              <p>
+                PostgreSQL provides strict serializability and row-level exclusivity:
+              </p>
+              <ul>
+                <li><code>FOR UPDATE NOWAIT</code>: Immediately acquires an exclusive row lock on <code>seat_inventories</code>. If another transaction holds the lock, PostgreSQL rejects the call with error code <code>55P03</code> instantly rather than blocking worker threads.</li>
+                <li><strong>Retry with Backoff:</strong> Wrapped in <code>retryTransaction</code> with exponential jitter to resolve transient lock contention.</li>
+                <li><strong>Segment Overlap Math:</strong> <code>seat_segment_locks</code> queries check <code>(fromSeq &lt; requestToSeq) AND (toSeq &gt; requestFromSeq)</code> to verify segment seat availability.</li>
+              </ul>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🎯</span> Exact Role in TrainTravel
+              </div>
+              <p>
+                Implemented in <code>inventory-service/src/services/inventory.service.js</code>. 
+              </p>
+              <p style="margin-top:0.5rem;">
+                It allows seats to be booked by passenger A from Delhi to Jaipur (Stops 1→2) and reused by passenger B from Jaipur to Mumbai (Stops 2→5) on the exact same train schedule! Background leader election utilizes <code>pg_try_advisory_lock(800001)</code> so only one instance cleans up expired seats.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech 3: Saga Distributed Transactions -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">SAGA</div>
+              <div>
+                <h3 class="tech-title">Saga Pattern (Orchestration & Compensation)</h3>
+                <span class="tech-tag">Distributed Transactions · Eventual Consistency · Audit Log</span>
+              </div>
+            </div>
+            <span class="tech-tag" style="background: rgba(197, 48, 48, 0.12); color: var(--color-danger); font-weight:700;">Distributed Consistency</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>💡</span> Plain English Explanation
+              </div>
+              <p>
+                Imagine planning a trip: 1) You hold the train seat, 2) You swipe your credit card, 3) You get your ticket.
+              </p>
+              <p style="margin-top:0.75rem;">
+                What if your credit card payment fails after the seat was held? A <strong>Saga Orchestrator is the conductor</strong> who steps in, cancels the hold, releases the seat back to the general public, and updates your account cleanly without leaving orphaned records.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚙️</span> In-Depth Technical Specification
+              </div>
+              <p>
+                In a distributed Database-per-Service architecture, classic ACID transactions (2PC) do not scale and introduce locking bottlenecks. The Saga Pattern replaces them:
+              </p>
+              <ul>
+                <li><strong>Forward Sequence:</strong> <code>HOLD_SEATS</code> $\rightarrow$ <code>CREATE_PAYMENT</code> $\rightarrow$ <code>CONFIRM_SEATS</code> $\rightarrow$ <code>COMPLETE</code>.</li>
+                <li><strong>SagaLog Persistence:</strong> Every step records state (<code>PENDING</code>, <code>COMPLETED</code>, <code>FAILED</code>) with input/output payloads in the database for crash recovery.</li>
+                <li><strong>Compensating Actions:</strong> On failure or timeout, the orchestrator triggers rollback steps in exact reverse order: <code>compensateConfirmSeats</code> $\rightarrow$ <code>compensateCreatePayment</code> (refund) $\rightarrow$ <code>compensateHoldSeats</code> (release lock).</li>
+              </ul>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🎯</span> Exact Role in TrainTravel
+              </div>
+              <p>
+                Built inside <code>booking-service/src/services/saga.service.js</code>. 
+              </p>
+              <p style="margin-top:0.5rem;">
+                Coordinates HTTP RPC calls between Booking, Inventory, and Payment services. If payment fails or times out, <code>compensateAll()</code> guarantees that locked seats are immediately released and refund records are generated idempotently using unique key hashes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech 4: Apache Kafka -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">KAFKA</div>
+              <div>
+                <h3 class="tech-title">Apache Kafka (Event-Driven Asynchronous Streaming)</h3>
+                <span class="tech-tag">KafkaJS · Dead Letter Queues · Pub/Sub · Event Sourcing</span>
+              </div>
+            </div>
+            <span class="tech-tag" style="background: var(--accent2-light); color: var(--accent2); font-weight:700;">Asynchronous Nervous System</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>💡</span> Plain English Explanation
+              </div>
+              <p>
+                When a train arrives at a station, the central station announcer doesn't walk up to every passenger and whisper in their ear. They broadcast over the public speaker system once.
+              </p>
+              <p style="margin-top:0.75rem;">
+                The display board updates, the cafeteria prepares food, and the taxi drivers line up outside. <strong>Kafka is that reliable public speaker system</strong>. It broadcasts events across all services without waiting for anyone to finish listening.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚙️</span> In-Depth Technical Specification
+              </div>
+              <p>
+                Kafka is a distributed partitioned commit log providing high throughput and fault tolerance:
+              </p>
+              <ul>
+                <li><strong>Decoupling & Non-Blocking I/O:</strong> Critical transactional paths don't wait on slow third-party operations (like sending emails or syncing search indexes).</li>
+                <li><strong>Dead Letter Queue (DLQ):</strong> If a consumer fails to process a message after 3 retries (<code>DLQ_MAX_RETRIES = 3</code>), it is moved to a dedicated DLQ topic (e.g. <code>dlq.booking-service</code>) to prevent poison pill consumer crashes.</li>
+                <li><strong>Idempotent Event Consumers:</strong> Every event carries an <code>eventKey</code> verified against an <code>IdempotencyRecord</code> table to prevent duplicate processing.</li>
+              </ul>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🎯</span> Exact Role in TrainTravel
+              </div>
+              <p>
+                Defined centrally in <code>shared/constants/kafka-topics.js</code>. 
+              </p>
+              <p style="margin-top:0.5rem;">
+                When an Admin creates a schedule, Kafka publishes <code>admin.schedule-created</code>. Inventory Service ingests it to generate seat matrix rows, while Search Service indexes it in Elasticsearch. Notification Service consumes <code>notification.otp-email</code> and <code>booking.confirmed</code> without slowing down user responses.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech 5: Redis Stack -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">REDIS</div>
+              <div>
+                <h3 class="tech-title">Redis 7 Stack (Caching, Token Rotation & TTL)</h3>
+                <span class="tech-tag">In-Memory · Sliding Window Rate Limiting · Refresh Token JTI</span>
+              </div>
+            </div>
+            <span class="tech-tag" style="background: rgba(43, 108, 176, 0.12); color: var(--color-info); font-weight:700;">Sub-Millisecond Speed</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>💡</span> Plain English Explanation
+              </div>
+              <p>
+                If a teacher asks you what 12 × 12 is, you don't open a calculator and compute it manually; you recite "144" from immediate memory in half a second.
+              </p>
+              <p style="margin-top:0.75rem;">
+                <strong>Redis is the lightning-fast short-term memory.</strong> It holds frequently requested user profiles and temporary 6-digit OTP codes in ultra-fast RAM so the main database isn't burdened.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚙️</span> In-Depth Technical Specification
+              </div>
+              <p>
+                Redis provides atomic in-memory data structures with automatic Time-to-Live (TTL):
+              </p>
+              <ul>
+                <li><strong>Refresh Token Rotation:</strong> Stores <code>refresh:{userId}:{deviceId} -> jti</code> with 7-day TTL. If an old token is reused, the session is invalidated immediately to defeat token replay attacks.</li>
+                <li><strong>OTP Security:</strong> <code>otp:session:{id}</code> stores bcrypt-hashed OTPs with strict 5-minute TTL, while <code>otp:rate:{email}</code> throttles users to 5 requests per hour.</li>
+                <li><strong>Profile Caching:</strong> Caches serialized user profiles with 24-hour TTL, slashing database reads by 80%.</li>
+              </ul>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🎯</span> Exact Role in TrainTravel
+              </div>
+              <p>
+                In <code>user-service/src/utils/otp.js</code> and <code>user-service/src/services/auth.service.js</code>. 
+              </p>
+              <p style="margin-top:0.5rem;">
+                Provides multi-device logout, brute-force OTP protection (maximum 3 failed verification attempts before auto-delete), and fast profile lookups before touching PostgreSQL.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech 6: Elasticsearch 8 -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">ES</div>
+              <div>
+                <h3 class="tech-title">Elasticsearch 8 (Low-Latency Full-Text & Route Search)</h3>
+                <span class="tech-tag">Inverted Index · Edge N-Gram · Geospatial · Typo Tolerance</span>
+              </div>
+            </div>
+            <span class="tech-tag" style="background: var(--accent-light); color: var(--accent); font-weight:700;">Sub-15ms Search</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>💡</span> Plain English Explanation
+              </div>
+              <p>
+                Finding a train route in a database with millions of stops using traditional SQL <code>LIKE '%NDLS%'</code> is like flipping through every single page of a 2,000-page railway catalog one-by-one.
+              </p>
+              <p style="margin-top:0.75rem;">
+                <strong>Elasticsearch is the master index at the back of the book.</strong> It organizes stations by keywords, spelling variations, and route sequences so you get search results in milliseconds even if you make a spelling typo!
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚙️</span> In-Depth Technical Specification
+              </div>
+              <p>
+                Elasticsearch utilizes an inverted index architecture tailored for high-dimensional document search:
+              </p>
+              <ul>
+                <li><strong>Fuzzy & Edge N-Gram Matching:</strong> Matches partial station names (e.g. "NDL" matches "New Delhi - NDLS") using token filters and Levenshtein edit distance.</li>
+                <li><strong>Multi-Stop Route Traversal:</strong> Queries schedules where <code>departureStation.sequenceNumber &lt; arrivalStation.sequenceNumber</code> on the same route path.</li>
+                <li><strong>Real-time Kafka Sync:</strong> Consumers in <code>search-service</code> listen to <code>inventory.seat-availability-updated</code> and patch live seat numbers into search documents.</li>
+              </ul>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🎯</span> Exact Role in TrainTravel
+              </div>
+              <p>
+                Implemented in <code>search-service/src/services/search.service.js</code> on port <code>4002</code>. 
+              </p>
+              <p style="margin-top:0.5rem;">
+                Powers the search bar on the React frontend, allowing travelers to search by station codes, city names, or train numbers with sub-15ms response times.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 2: ARCHITECTURE DIAGRAM & PORT MAPPINGS
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="architecture" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">02</span>
+          <h2 class="section-heading">Microservices Topology & Distributed Architecture</h2>
+        </div>
+        <p class="section-subtext">Comprehensive visual architecture diagram showing synchronous RPC, asynchronous Kafka streams, and storage isolation</p>
+      </div>
+
+      <div class="arch-container">
+        <!-- SVG Architecture Diagram: Enhanced ViewBox, High Contrast, 100% Complete -->
+        <svg viewBox="0 0 1060 710" width="100%" height="auto" style="overflow: visible; display: block;">
+          <defs>
+            <linearGradient id="gradGateway" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#004743" />
+              <stop offset="100%" stop-color="#002D2A" />
+            </linearGradient>
+            <linearGradient id="gradService" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FAFAF7" />
+              <stop offset="100%" stop-color="#E8E4D9" />
+            </linearGradient>
+            <linearGradient id="gradKafka" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#B8860B" />
+              <stop offset="100%" stop-color="#7B5907" />
+            </linearGradient>
+            <linearGradient id="gradStorage" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2B6CB0" />
+              <stop offset="100%" stop-color="#1A365D" />
+            </linearGradient>
+            <filter id="boxShadow" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="4" stdDeviation="5" flood-opacity="0.12" />
+            </filter>
+            <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L7,3 z" fill="#004743" />
+            </marker>
+            <marker id="arrowGold" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L7,3 z" fill="#B8860B" />
+            </marker>
+            <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L7,3 z" fill="#2B6CB0" />
+            </marker>
+          </defs>
+
+          <!-- CLIENT LAYER -->
+          <g transform="translate(410, 25)" filter="url(#boxShadow)">
+            <rect width="240" height="55" rx="8" fill="#FFFFFF" stroke="#004743" stroke-width="2" />
+            <text x="120" y="26" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="14" fill="#004743">React 18 Frontend Client</text>
+            <text x="120" y="44" text-anchor="middle" font-family="'DM Mono', monospace" font-size="11" fill="#76756D">Vite · Tailwind · Zustand · Port 3000</text>
+          </g>
+
+          <path d="M 530, 80 L 530, 120" stroke="#004743" stroke-width="2.5" marker-end="url(#arrowTeal)" />
+
+          <!-- API GATEWAY -->
+          <g transform="translate(320, 125)" filter="url(#boxShadow)">
+            <rect width="420" height="75" rx="10" fill="url(#gradGateway)" />
+            <text x="210" y="32" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="17" fill="#F0EDE4">API Gateway (Port 4000)</text>
+            <text x="210" y="52" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="11.5" fill="#E6C79C">JWT Auth Verification · Rate Limiting · Circuit Breaker · Razorpay Webhooks</text>
+            <text x="210" y="66" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#CBD5E0">Single External Perimeter Entrypoint</text>
+          </g>
+
+          <!-- CONNECTOR LINES FROM GATEWAY TO SERVICES -->
+          <path d="M 360, 200 L 100, 260" stroke="#004743" stroke-width="1.8" marker-end="url(#arrowTeal)" />
+          <path d="M 420, 200 L 260, 260" stroke="#004743" stroke-width="1.8" marker-end="url(#arrowTeal)" />
+          <path d="M 480, 200 L 420, 260" stroke="#004743" stroke-width="1.8" marker-end="url(#arrowTeal)" />
+          <path d="M 540, 200 L 580, 260" stroke="#004743" stroke-width="1.8" marker-end="url(#arrowTeal)" />
+          <path d="M 600, 200 L 740, 260" stroke="#004743" stroke-width="1.8" marker-end="url(#arrowTeal)" />
+          <path d="M 660, 200 L 920, 260" stroke="#004743" stroke-width="1.8" marker-end="url(#arrowTeal)" />
+
+          <!-- MICROSERVICES TIER (6 ACTIVE REST SERVICES) -->
+          <!-- User Service -->
+          <g transform="translate(30, 265)" filter="url(#boxShadow)">
+            <rect width="145" height="110" rx="8" fill="#FAFAF7" stroke="#004743" stroke-width="1.5" />
+            <text x="72" y="24" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="12" fill="#004743">User Service</text>
+            <text x="72" y="40" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#B8860B">Port 4001</text>
+            <line x1="12" y1="48" x2="133" y2="48" stroke="#E8E4D9" />
+            <text x="18" y="65" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Auth & JWT</text>
+            <text x="18" y="80" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Email OTP</text>
+            <text x="18" y="95" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Profiles</text>
+          </g>
+
+          <!-- Search Service -->
+          <g transform="translate(195, 265)" filter="url(#boxShadow)">
+            <rect width="145" height="110" rx="8" fill="#FAFAF7" stroke="#004743" stroke-width="1.5" />
+            <text x="72" y="24" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="12" fill="#004743">Search Service</text>
+            <text x="72" y="40" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#B8860B">Port 4002</text>
+            <line x1="12" y1="48" x2="133" y2="48" stroke="#E8E4D9" />
+            <text x="18" y="65" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Elasticsearch</text>
+            <text x="18" y="80" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Station Autocomplete</text>
+            <text x="18" y="95" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Route Traversal</text>
+          </g>
+
+          <!-- Admin Service -->
+          <g transform="translate(360, 265)" filter="url(#boxShadow)">
+            <rect width="145" height="110" rx="8" fill="#FAFAF7" stroke="#004743" stroke-width="1.5" />
+            <text x="72" y="24" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="12" fill="#004743">Admin Service</text>
+            <text x="72" y="40" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#B8860B">Port 4003</text>
+            <line x1="12" y1="48" x2="133" y2="48" stroke="#E8E4D9" />
+            <text x="18" y="65" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Trains & Stations</text>
+            <text x="18" y="80" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Route Topology</text>
+            <text x="18" y="95" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Schedule Mgmt</text>
+          </g>
+
+          <!-- Booking Service (Saga Orchestrator) -->
+          <g transform="translate(525, 265)" filter="url(#boxShadow)">
+            <rect width="155" height="110" rx="8" fill="#FAFAF7" stroke="#C53030" stroke-width="2" />
+            <text x="77" y="24" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="12" fill="#C53030">Booking Service</text>
+            <text x="77" y="40" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#B8860B">Port 4005 · Orchestrator</text>
+            <line x1="12" y1="48" x2="143" y2="48" stroke="#E8E4D9" />
+            <text x="16" y="65" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Saga Orchestration</text>
+            <text x="16" y="80" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• SagaLog Audit State</text>
+            <text x="16" y="95" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Rollback Coordinator</text>
+          </g>
+
+          <!-- Payment Service -->
+          <g transform="translate(700, 265)" filter="url(#boxShadow)">
+            <rect width="150" height="110" rx="8" fill="#FAFAF7" stroke="#004743" stroke-width="1.5" />
+            <text x="75" y="24" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="12" fill="#004743">Payment Service</text>
+            <text x="75" y="40" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#B8860B">Port 4006</text>
+            <line x1="12" y1="48" x2="138" y2="48" stroke="#E8E4D9" />
+            <text x="16" y="65" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Razorpay SDK</text>
+            <text x="16" y="80" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Webhook Signatures</text>
+            <text x="16" y="95" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Automated Refunds</text>
+          </g>
+
+          <!-- Inventory Service (Locking Engine) -->
+          <g transform="translate(870, 265)" filter="url(#boxShadow)">
+            <rect width="160" height="110" rx="8" fill="#FAFAF7" stroke="#0D7B54" stroke-width="2" />
+            <text x="80" y="24" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="12" fill="#0D7B54">Inventory Service</text>
+            <text x="80" y="40" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#B8860B">Port 4007 · Lock Engine</text>
+            <line x1="12" y1="48" x2="148" y2="48" stroke="#E8E4D9" />
+            <text x="16" y="65" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Row Locks (NOWAIT)</text>
+            <text x="16" y="80" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Segment Booking</text>
+            <text x="16" y="95" font-family="'DM Sans', sans-serif" font-size="10" fill="#4A4A44">• Advisory Lock Cleaner</text>
+          </g>
+
+          <!-- SAGA RPC ARROWS BETWEEN BOOKING, INVENTORY & PAYMENT -->
+          <path d="M 602, 375 C 602, 405 775, 405 775, 380" fill="none" stroke="#C53030" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrowTeal)" />
+          <text x="688" y="420" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" font-weight="700" fill="#C53030">Saga 2: Payment Create</text>
+
+          <path d="M 602, 375 C 602, 435 950, 435 950, 380" fill="none" stroke="#C53030" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrowTeal)" />
+          <text x="770" y="450" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" font-weight="700" fill="#C53030">Saga 1: Hold Seats · Saga 3: Confirm Seats</text>
+
+          <!-- ASYNC EVENT BROKER: APACHE KAFKA BUS -->
+          <g transform="translate(60, 475)" filter="url(#boxShadow)">
+            <rect width="940" height="70" rx="10" fill="url(#gradKafka)" />
+            <text x="470" y="28" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="16" fill="#FFFFFF">Apache Kafka Event Streaming Bus (Port 9092 / 9093)</text>
+            <text x="470" y="48" text-anchor="middle" font-family="'DM Mono', monospace" font-size="11" fill="#FEEBC8">
+              Topics: admin.schedule-created · inventory.seat-availability-updated · booking.confirmed · dlq.*
+            </text>
+            <text x="470" y="62" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10" fill="#FFFFFF">
+              Asynchronous Decoupling · Dead Letter Queue (DLQ Max 3 Retries) · Event Sourcing
+            </text>
+          </g>
+
+          <!-- Notification Service (Kafka Consumer only) -->
+          <g transform="translate(60, 400)" filter="url(#boxShadow)">
+            <rect width="180" height="50" rx="6" fill="#FAFAF7" stroke="#B8860B" stroke-width="1.5" />
+            <text x="90" y="22" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="11" fill="#004743">Notification Service</text>
+            <text x="90" y="38" text-anchor="middle" font-family="'DM Mono', monospace" font-size="9.5" fill="#B8860B">Port 4004 (Kafka Consumer)</text>
+          </g>
+          <path d="M 150, 475 L 150, 453" stroke="#B8860B" stroke-width="2" marker-end="url(#arrowGold)" />
+
+          <!-- STORAGE TIER -->
+          <!-- PostgreSQL -->
+          <g transform="translate(140, 575)" filter="url(#boxShadow)">
+            <rect width="240" height="90" rx="8" fill="url(#gradStorage)" />
+            <text x="120" y="30" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="15" fill="#FFFFFF">PostgreSQL 15</text>
+            <text x="120" y="50" text-anchor="middle" font-family="'DM Mono', monospace" font-size="11" fill="#CBD5E0">Port 5432 · Dedicated Schemas</text>
+            <text x="120" y="70" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10.5" fill="#A0AEC0">Prisma ORM · Advisory Locks · ACID</text>
+          </g>
+
+          <!-- Redis Stack -->
+          <g transform="translate(430, 575)" filter="url(#boxShadow)">
+            <rect width="240" height="90" rx="8" fill="url(#gradStorage)" />
+            <text x="120" y="30" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="15" fill="#FFFFFF">Redis 7 Stack</text>
+            <text x="120" y="50" text-anchor="middle" font-family="'DM Mono', monospace" font-size="11" fill="#CBD5E0">Port 6379 · RedisInsight 8001</text>
+            <text x="120" y="70" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10.5" fill="#A0AEC0">OTP TTL · Token Rotation · User Cache</text>
+          </g>
+
+          <!-- Elasticsearch Cluster -->
+          <g transform="translate(720, 575)" filter="url(#boxShadow)">
+            <rect width="240" height="90" rx="8" fill="url(#gradStorage)" />
+            <text x="120" y="30" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="15" fill="#FFFFFF">Elasticsearch 8</text>
+            <text x="120" y="50" text-anchor="middle" font-family="'DM Mono', monospace" font-size="11" fill="#CBD5E0">Port 9200 Cluster</text>
+            <text x="120" y="70" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10.5" fill="#A0AEC0">Inverted Index · Edge N-Gram · Route Search</text>
+          </g>
+
+          <!-- Storage Connectors -->
+          <path d="M 260, 545 L 260, 575" stroke="#2B6CB0" stroke-width="2" marker-end="url(#arrowBlue)" />
+          <path d="M 550, 545 L 550, 575" stroke="#2B6CB0" stroke-width="2" marker-end="url(#arrowBlue)" />
+          <path d="M 840, 545 L 840, 575" stroke="#2B6CB0" stroke-width="2" marker-end="url(#arrowBlue)" />
+        </svg>
+
+        <p class="diagram-caption">
+          Figure 1: Complete distributed microservices topology of TrainTravel. Synchronous REST calls (solid dark arrows), asynchronous Kafka event bus (gold center), and dedicated data tiers (blue bottom).
+        </p>
+
+        <!-- PORT DIRECTORY TABLE -->
+        <div class="ports-table-wrap">
+          <table class="ports-table">
+            <thead>
+              <tr>
+                <th>Service / Component</th>
+                <th>Port</th>
+                <th>Role & Protocol</th>
+                <th>Tech Stack & Storage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>API Gateway</strong></td>
+                <td><span class="port-badge">4000</span></td>
+                <td>Public REST entrypoint, JWT verification, rate limiting, Razorpay webhook passthrough</td>
+                <td>Express.js, Helmet, Morgan, Cookie-Parser</td>
+              </tr>
+              <tr>
+                <td><strong>User Service</strong></td>
+                <td><span class="port-badge">4001</span></td>
+                <td>Auth, OTP verification, Profile management, Refresh Token rotation</td>
+                <td>Node.js, PostgreSQL (Prisma), Redis 7 (ioredis)</td>
+              </tr>
+              <tr>
+                <td><strong>Search Service</strong></td>
+                <td><span class="port-badge">4002</span></td>
+                <td>Low-latency fuzzy train & route search (&lt;15ms)</td>
+                <td>Node.js, Elasticsearch 8, Kafka Consumer</td>
+              </tr>
+              <tr>
+                <td><strong>Admin Service</strong></td>
+                <td><span class="port-badge">4003</span></td>
+                <td>Train, station, route & schedule master data</td>
+                <td>Node.js, PostgreSQL (Prisma), Kafka Producer</td>
+              </tr>
+              <tr>
+                <td><strong>Notification Service</strong></td>
+                <td><span class="port-badge">4004</span></td>
+                <td>Email OTP, welcome, and booking confirmation (no public HTTP port)</td>
+                <td>Pure Kafka Consumer, Nodemailer, SendGrid</td>
+              </tr>
+              <tr>
+                <td><strong>Booking Service</strong></td>
+                <td><span class="port-badge">4005</span></td>
+                <td>Saga Orchestrator, booking lifecycle, audit logging</td>
+                <td>Node.js, PostgreSQL (SagaLog), Axios RPC clients</td>
+              </tr>
+              <tr>
+                <td><strong>Payment Service</strong></td>
+                <td><span class="port-badge">4006</span></td>
+                <td>Razorpay payment orders, webhook verification, refunds</td>
+                <td>Node.js, PostgreSQL, Razorpay SDK</td>
+              </tr>
+              <tr>
+                <td><strong>Inventory Service</strong></td>
+                <td><span class="port-badge">4007</span></td>
+                <td>Seat matrix, segment locking, lock expiry cron</td>
+                <td>PostgreSQL (Row-Level Locks), Advisory Locks</td>
+              </tr>
+              <tr>
+                <td><strong>Frontend Client</strong></td>
+                <td><span class="port-badge">3000</span></td>
+                <td>Interactive seat map, search UI, payment flow</td>
+                <td>React 18, Vite, Tailwind CSS, Zustand</td>
+              </tr>
+              <tr>
+                <td><strong>PostgreSQL Database</strong></td>
+                <td><span class="port-badge">5432</span></td>
+                <td>Multi-schema relational databases for domain isolation</td>
+                <td>Postgres 15 Official Docker Image</td>
+              </tr>
+              <tr>
+                <td><strong>Redis 7 Stack & UI</strong></td>
+                <td><span class="port-badge">6379 / 8001</span></td>
+                <td>In-memory cache, token JTI store, RedisInsight visual dashboard</td>
+                <td>Redis Stack 6.2.6-v19 with password protection</td>
+              </tr>
+              <tr>
+                <td><strong>Apache Kafka & UI</strong></td>
+                <td><span class="port-badge">9092 / 8080</span></td>
+                <td>Event stream broker & Provectus Kafka-UI visual dashboard</td>
+                <td>Confluent Kafka & ZooKeeper 7.5.0</td>
+              </tr>
+              <tr>
+                <td><strong>Elasticsearch Cluster</strong></td>
+                <td><span class="port-badge">9200</span></td>
+                <td>Inverted index search engine cluster</td>
+                <td>Elasticsearch 8.12.0 Single-Node Cluster</td>
+              </tr>
+              <tr>
+                <td><strong>PgAdmin 4</strong></td>
+                <td><span class="port-badge">8081</span></td>
+                <td>PostgreSQL database administration GUI web interface</td>
+                <td>dpage/pgadmin4 Docker Image</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 3: SYSTEM DESIGN DECISIONS & PROBLEM SOLVING
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="system-design" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">03</span>
+          <h2 class="section-heading">System Design Challenges & Computer Science Rationale</h2>
+        </div>
+        <p class="section-subtext">The hard engineering problems solved in TrainTravel to guarantee zero double bookings and eventual consistency</p>
+      </div>
+
+      <div class="tech-grid">
+
+        <!-- Challenge 1: Tatkal Concurrency -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">01</div>
+              <h3 class="tech-title">Preventing Seat Double-Bookings Under High Concurrency</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(197, 48, 48, 0.12); color: var(--color-danger); font-weight:700;">Critical Concurrency</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>⚠️</span> Why Optimistic Locking Fails During Peak Booking
+              </div>
+              <p>
+                In high-velocity flash sales (like Indian Railway Tatkal opening), 10,000 users try to book the exact same 50 seats in the first 2 seconds.
+              </p>
+              <p style="margin-top:0.75rem;">
+                If you use simple optimistic locking (e.g. <code>WHERE version = 1</code>), 9,990 transactions will fail at commit time, triggering massive cascading database rollbacks, wasted CPU cycles, and terrible user experience.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> TrainTravel's Dual Locking Architecture
+              </div>
+              <p>
+                TrainTravel enforces <strong>Pessimistic Row-Level Locking with <code>NOWAIT</code></strong>:
+              </p>
+              <ul>
+                <li><code>SELECT ... FOR UPDATE NOWAIT</code>: Locks the specific seat rows in PostgreSQL immediately. If another transaction holds the lock, it fails instantly instead of waiting in a blocking queue that exhausts database connection pools.</li>
+                <li><strong>Retry with Jitter:</strong> Wrapped in <code>retryTransaction</code> with exponential backoff (100ms, 200ms, 400ms) to smoothly absorb transient lock contention.</li>
+                <li><strong>Distributed Advisory Leader Election:</strong> Running seat lock cleanup every 15 seconds across multiple container instances is dangerous. We use <code>SELECT pg_try_advisory_lock(800001)</code> so exactly <em>one</em> instance executes the cleanup job without distributed race conditions!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 2: Segment Booking -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">02</div>
+              <h3 class="tech-title">Dynamic Route Topology & Segment Seat Reuse</h3>
+            </div>
+            <span class="tech-tag" style="background: var(--accent-light); color: var(--accent); font-weight:700;">Mathematical Interval Algebra</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>📐</span> The Problem with Monolithic Seat Allocation
+              </div>
+              <p>
+                A train runs from <strong>Delhi (Seq 1) $\rightarrow$ Jaipur (Seq 2) $\rightarrow$ Ahmedabad (Seq 3) $\rightarrow$ Mumbai (Seq 4)</strong>.
+              </p>
+              <p style="margin-top:0.75rem;">
+                In naive systems, booking Seat 12 from Delhi to Jaipur marks Seat 12 as "BOOKED" for the entire journey. That prevents someone from booking Seat 12 from Ahmedabad to Mumbai, leaving train coaches half-empty and losing thousands of dollars in ticket revenue!
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🚀</span> TrainTravel's Interval Overlap Algorithm
+              </div>
+              <p>
+                TrainTravel introduced <code>seat_segment_locks</code>, which decouples physical seats from journey segments:
+              </p>
+              <div class="code-snippet-wrap">
+                <div class="code-snippet-header">
+                  <span class="code-snippet-title">PostgreSQL Segment Overlap Check</span>
+                </div>
+                <pre><code><span class="hl-cmt">/* Two intervals [A_from, A_to] and [B_from, B_to] overlap IF AND ONLY IF:
+   A_from &lt; B_to AND A_to &gt; B_from */</span>
+<span class="hl-kw">SELECT</span> <span class="hl-str">"seatId"</span> <span class="hl-kw">FROM</span> seat_segment_locks
+<span class="hl-kw">WHERE</span> <span class="hl-str">"scheduleId"</span> = ${scheduleId}
+  <span class="hl-kw">AND</span> <span class="hl-str">"seatId"</span> = <span class="hl-kw">ANY</span>(${seatIds}::text[])
+  <span class="hl-kw">AND</span> status <span class="hl-kw">IN</span> (<span class="hl-str">'LOCKED'</span>, <span class="hl-str">'BOOKED'</span>)
+  <span class="hl-kw">AND</span> <span class="hl-str">"fromSeq"</span> &lt; ${toSeq}
+  <span class="hl-kw">AND</span> <span class="hl-str">"toSeq"</span> &gt; ${fromSeq}
+<span class="hl-kw">FOR UPDATE NOWAIT</span>;</code></pre>
+              </div>
+              <p>
+                If no overlap exists, passenger B can book Seat 12 from Ahmedabad to Mumbai even while passenger A is sitting in it from Delhi to Jaipur!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 3: Distributed Transactions -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">03</div>
+              <h3 class="tech-title">Saga Orchestration vs Two-Phase Commit (2PC)</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(43, 108, 176, 0.12); color: var(--color-info); font-weight:700;">CAP Theorem Trade-Off</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚠️</span> Why 2PC Fails in Cloud Microservices
+              </div>
+              <p>
+                Two-Phase Commit (2PC) requires a central coordinator to lock all participating database rows across multiple network servers simultaneously until everyone votes "YES".
+              </p>
+              <p style="margin-top:0.75rem;">
+                If the Payment Gateway or external network hiccups, all seats across Postgres instances remain locked indefinitely, degrading system availability (violating the CAP theorem).
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> Orchestrated Saga with Audit Log
+              </div>
+              <p>
+                TrainTravel embraces <strong>Eventual Consistency</strong> via the Saga Orchestrator:
+              </p>
+              <ul>
+                <li><strong>Local Transactions:</strong> Each service commits its changes locally within its own database without holding distributed locks across the network.</li>
+                <li><strong>SagaLog Table:</strong> Records every state transition (<code>HOLD_SEATS</code>, <code>CREATE_PAYMENT</code>, <code>CONFIRM_SEATS</code>) with JSON payloads in PostgreSQL.</li>
+                <li><strong>Compensating Actions:</strong> If a user closes their browser or Razorpay reports a payment failure, the orchestrator triggers <code>compensateAll()</code>: issuing automated refunds and unholding seats asynchronously.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 4: Poison Pills & DLQ -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">04</div>
+              <h3 class="tech-title">Dead Letter Queues (DLQ) & Poison Pill Resilience</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(184, 134, 11, 0.12); color: var(--accent2); font-weight:700;">Fault Tolerance</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>⚠️</span> What is a "Poison Pill" Message?
+              </div>
+              <p>
+                Imagine a Kafka message arrives with corrupted JSON (e.g. missing an email address). If the consumer crashes every time it reads it, Kafka will re-deliver the exact same message forever.
+              </p>
+              <p style="margin-top:0.75rem;">
+                The consumer gets stuck in an infinite crash loop, halting all legitimate ticket confirmations for all other users!
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> TrainTravel's DLQ Architecture
+              </div>
+              <p>
+                Centrally configured in <code>shared/constants/kafka-topics.js</code>:
+              </p>
+              <ul>
+                <li><code>DLQ_MAX_RETRIES = 3</code>: If a message fails processing 3 times in a row, the consumer logs an alert and pushes the payload to a dedicated service DLQ (e.g. <code>dlq.booking-service</code>).</li>
+                <li><strong>Unblocked Partitions:</strong> Kafka partition offsets advance smoothly so subsequent booking events are never blocked by a single malformed packet.</li>
+                <li><strong>Idempotency Records:</strong> Every consumer checks <code>IdempotencyRecord</code> table to ensure network retransmits never create duplicate inventory or double charges.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 5: Multi-Key Distributed Locks & Lua Scripts -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">05</div>
+              <h3 class="tech-title">Multi-Key Redis Distributed Locking via Atomic Lua Scripts & Deadlock Prevention</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(0, 71, 67, 0.12); color: var(--accent); font-weight:700;">Distributed Concurrency</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚠️</span> Why Standard Redis SET NX / MULTI Fails for Multi-Seat Reservations
+              </div>
+              <p>
+                When a family books 4 seats together (e.g. Seats 12, 13, 14, 15), acquiring locks sequentially over HTTP/TCP introduces severe race conditions. If User A locks Seat 12 and User B locks Seat 13, both users get stuck holding half a reservation (partial allocation).
+              </p>
+              <p style="margin-top:0.75rem;">
+                Furthermore, standard Redis <code>MULTI / EXEC</code> transactions cannot inspect state mid-flight: they queue commands blindly without the ability to roll back if an earlier key fails. If two users lock the same set in reverse order ([12, 13] vs [13, 12]), a classic distributed deadlock (Dining Philosophers problem) occurs.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> TrainTravel's Atomic Lua Engine & Key Sorting
+              </div>
+              <p>
+                Engineered in <code>booking-service/src/utils/distributedLock.js</code>:
+              </p>
+              <ul>
+                <li><strong>Deadlock Prevention via Key Sorting:</strong> All seat IDs are sorted lexicographically (<code>[...seatIds].sort()</code>) before constructing keys. Every concurrent worker acquires locks in the exact same deterministic global order, mathematically eliminating circular wait conditions!</li>
+                <li><strong>All-or-Nothing Atomic Lua Evaluation:</strong> We execute an atomic Lua script directly inside the Redis engine:
+                  <br><code>for i, key in ipairs(KEYS) do ... if not result then for j = 1, #acquired do redis.call('DEL', acquired[j]) end return 0 end</code>.
+                  <br>If even a <em>single</em> seat is unavailable, Lua automatically unrolls and deletes all previously acquired locks in the batch, returning 0 without network round-trips!</li>
+                <li><strong>Safe Release with Ownership Verification:</strong> The release Lua script verifies that <code>redis.call('GET', key) == lockValue</code> before deleting, guaranteeing that a delayed request never accidentally releases a lock owned by a subsequent booking.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 6: Distributed Leader Election & Optimistic CAS Versioning -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">06</div>
+              <h3 class="tech-title">Distributed Leader Election (Redis vs PostgreSQL) & Optimistic CAS Race Prevention</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(184, 134, 11, 0.12); color: var(--accent2); font-weight:700;">Horizontal Scalability</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>📐</span> Multi-Pod Background Jobs & Payment Race Hazards
+              </div>
+              <p>
+                When running 5 autoscaled replicas of <code>booking-service</code> and <code>inventory-service</code>, background cleanup cron jobs running every 30 seconds can unleash chaos: all 5 pods scan the database simultaneously, compete for row updates, and send 5 duplicate Kafka cancellation notifications.
+              </p>
+              <p style="margin-top:0.75rem;">
+                Even worse is the <strong>Payment Webhook Race Hazard</strong>: User pays at second 599. At second 600, Razorpay's webhook arrives at <code>payment-service</code> while simultaneously the background expiry job wakes up in <code>booking-service</code>. If the expiry job cancels the booking without checking whether payment succeeded, the customer is charged but loses their ticket!
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> Dual Leader Election & Versioned Optimistic Locking (CAS)
+              </div>
+              <p>
+                TrainTravel implements a multi-layered defense:
+              </p>
+              <ul>
+                <li><strong>Redis Leader Election:</strong> In <code>booking-service/src/utils/bookingExpiry.js</code>, pods compete via <code>redis.set('booking:expiry-job:leader', pid, 'NX', 'EX', 25)</code>. Exactly one pod wins the lease per 30-second cycle; non-leaders immediately yield.</li>
+                <li><strong>PostgreSQL Advisory Lock Leader Election:</strong> In <code>inventory-service/src/utils/lockExpiry.js</code>, instances call <code>SELECT pg_try_advisory_lock(800001)</code>. The engine allocates a dedicated 64-bit application-level lock without touching table rows.</li>
+                <li><strong>Optimistic Compare-And-Swap (CAS) Versioning:</strong> When expiring a booking, we execute:
+                  <br><code>prisma.booking.updateMany({ where: { id: booking.id, version: booking.version, status: { in: ['PENDING', 'SEATS_HELD', 'PAYMENT_PENDING'] } }, data: { status: 'EXPIRED', version: { increment: 1 } } })</code>.
+                  <br>If the concurrent payment webhook increments <code>version</code> first, <code>claimed.count === 0</code>! The expiry job safely backs off without cancelling a paid ticket!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 7: Cryptographic Protection & Anti-Fraud Defense -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">07</div>
+              <h3 class="tech-title">Cryptographic Timing Attack Prevention & Client Device Fingerprinting</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(197, 48, 48, 0.12); color: var(--color-danger); font-weight:700;">Application Security (AppSec)</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header simple">
+                <span>⚠️</span> Side-Channel Timing Vulnerabilities & Token Hijacking
+              </div>
+              <p>
+                Standard string equality in JavaScript (<code>storedOtp === inputOtp</code>) returns <code>false</code> at the first mismatching character. Comparing <code>"123456"</code> against <code>"987654"</code> terminates in ~12 nanoseconds, while comparing against <code>"123459"</code> terminates in ~45 nanoseconds.
+              </p>
+              <p style="margin-top:0.75rem;">
+                Over local networks or low-jitter fiber connections, sophisticated attackers measure statistical response latency variance to progressively deduce OTP digits without brute-forcing all $10^6$ combinations! Furthermore, stolen JWT tokens can be replayed from rogue browser sessions.
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> TrainTravel's AppSec Implementation
+              </div>
+              <p>
+                Implemented in <code>user-service/src/utils/otp.js</code> & <code>deviceFingerprint.js</code>:
+              </p>
+              <ul>
+                <li><strong>Constant-Time Verification:</strong> We compute HMAC-SHA256 over <code>${email}:${otp}</code> and verify using <code>crypto.timingSafeEqual(Buffer.from(hashedOtp, 'hex'), Buffer.from(storedOtp, 'hex'))</code>. Execution duration is mathematically identical regardless of mismatch position!</li>
+                <li><strong>Hardware & Header Device Fingerprinting:</strong> Every request generates a deterministic 16-character SHA-256 fingerprint: <code>crypto.createHash('sha256').update(`${userAgent}|${ip}|${accept}`).digest('hex').slice(0, 16)</code>. Sessions and refresh tokens are bound to this fingerprint.</li>
+                <li><strong>Zero-Trust Internal Network Headers:</strong> Internal endpoints require <code>x-internal-service-key</code> verified by <code>internalAuth.middleware.js</code>, and <code>x-user-id</code> is strictly propagated from the verified API Gateway JWT claim.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenge 8: Payment Gateway Strategy & Raw Byte Stream Integrity -->
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-name-group">
+              <div class="tech-icon-badge">08</div>
+              <h3 class="tech-title">Pluggable Payment Gateway Strategy Pattern & Raw Byte Webhook Verification</h3>
+            </div>
+            <span class="tech-tag" style="background: rgba(43, 108, 176, 0.12); color: var(--color-info); font-weight:700;">Design Patterns & PSP Architecture</span>
+          </div>
+
+          <div class="explanation-columns">
+            <div class="explanation-pane">
+              <div class="pane-header technical">
+                <span>⚠️</span> Why JSON Parsing Breaks Cryptographic Webhook Signatures
+              </div>
+              <p>
+                When payment gateways like Razorpay dispatch webhooks, they attach an HTTP header <code>x-razorpay-signature</code> generated by computing an HMAC-SHA256 signature across the <strong>raw binary byte stream</strong> of the incoming request body.
+              </p>
+              <p style="margin-top:0.75rem;">
+                If an Express gateway uses default <code>express.json()</code>, it parses the payload into a JavaScript Object and re-serializes it when proxying downstream. Re-serialization changes object key order, spacing, and UTF-8 encoding, breaking the cryptographic signature and causing genuine payment confirmations to be rejected!
+              </p>
+            </div>
+
+            <div class="explanation-pane">
+              <div class="pane-header project">
+                <span>🛡️</span> TrainTravel's Factory Pattern & Raw Stream Pipeline
+              </div>
+              <p>
+                Engineered in <code>payment-service</code> & <code>api-gateway/src/index.js</code>:
+              </p>
+              <ul>
+                <li><strong>Raw Buffer Interceptor:</strong> In <code>api-gateway/src/index.js</code>, the webhook route is conditionally intercepted:
+                  <br><code>if (req.path === '/api/payments/webhooks/razorpay') { express.raw({ type: 'application/json' })(req, res, next); }</code>.
+                  <br>The uncorrupted raw buffer reaches the signature verifier with 100% cryptographic byte fidelity.</li>
+                <li><strong>Polymorphic Gateway Strategy Pattern:</strong> In <code>payment-service/src/services/gateways/</code>, we define an abstract <code>BaseGateway</code> class with standard interfaces (<code>createOrder</code>, <code>verifyPayment</code>, <code>refundPayment</code>, <code>verifyWebhookSignature</code>).</li>
+                <li><strong>Singleton Factory:</strong> <code>gateway.factory.js</code> dynamically instantiates <code>RazorpayGateway</code> (or Stripe/PayPal) based on the <code>PAYMENT_GATEWAY</code> environment variable, enabling hot-swappable payment service providers without altering a single line of booking business logic!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 4: COMPLETE DATABASE SCHEMAS (PRISMA DOMAINS)
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="database-schema" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">04</span>
+          <h2 class="section-heading">Database Schemas & Cross-Service Data Models</h2>
+        </div>
+        <p class="section-subtext">The complete Prisma schema definitions across all dedicated PostgreSQL microservice databases</p>
+      </div>
+
+      <!-- Inventory DB Schema -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">inventory-service/prisma/schema.prisma</span>
+            <span class="file-role-badge">Inventory Domain DB</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Core Entities</h4>
+              <p><code>ScheduleInventory</code> (train schedules & aggregated counts), <code>SeatInventory</code> (physical seats), <code>SeatSegmentLock</code> (interval segment tracking), and <code>RouteStop</code> (topological stations).</p>
+            </div>
+            <div class="meta-box">
+              <h4>Data Integrity & Optimization</h4>
+              <p>Unique constraints on <code>[scheduleId, seatNumber]</code>, indexes on <code>[lockExpiresAt, status]</code> for high-speed background lock eviction, and <code>version</code> counters for optimistic validation.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">Prisma Models: SeatInventory, ScheduleInventory & SeatSegmentLock</span>
+            </div>
+            <pre><code><span class="hl-kw">enum</span> <span class="hl-typ">SeatStatus</span> {
+  AVAILABLE
+  LOCKED
+  BOOKED
+  CANCELLED
+}
+
+<span class="hl-kw">model</span> <span class="hl-typ">ScheduleInventory</span> {
+  id            <span class="hl-typ">String</span>   @id @default(uuid())
+  scheduleId    <span class="hl-typ">String</span>   @unique
+  trainId       <span class="hl-typ">String</span>
+  trainNumber   <span class="hl-typ">String</span>
+  trainName     <span class="hl-typ">String</span>
+  departureDate <span class="hl-typ">DateTime</span> @db.Date
+  totalSeats    <span class="hl-typ">Int</span>
+  available     <span class="hl-typ">Int</span>
+  locked        <span class="hl-typ">Int</span>      @default(0)
+  booked        <span class="hl-typ">Int</span>      @default(0)
+  status        <span class="hl-typ">String</span>   @default("ACTIVE")
+  version       <span class="hl-typ">Int</span>      @default(0)
+  createdAt     <span class="hl-typ">DateTime</span> @default(now())
+  updatedAt     <span class="hl-typ">DateTime</span> @updatedAt
+
+  seats <span class="hl-typ">SeatInventory</span>[]
+
+  @@index([trainId])
+  @@index([scheduleId, status])
+  @@map("schedule_inventories")
+}
+
+<span class="hl-kw">model</span> <span class="hl-typ">SeatInventory</span> {
+  id                  <span class="hl-typ">String</span>     @id @default(uuid())
+  scheduleInventoryId <span class="hl-typ">String</span>
+  scheduleId          <span class="hl-typ">String</span>
+  seatId              <span class="hl-typ">String</span>
+  seatNumber          <span class="hl-typ">Int</span>
+  seatType            <span class="hl-typ">String</span>
+  price               <span class="hl-typ">Float</span>
+  status              <span class="hl-typ">SeatStatus</span> @default(AVAILABLE)
+  lockedBy            <span class="hl-typ">String?</span>
+  lockedAt            <span class="hl-typ">DateTime?</span>
+  lockExpiresAt       <span class="hl-typ">DateTime?</span>
+  bookingId           <span class="hl-typ">String?</span>
+  version             <span class="hl-typ">Int</span>        @default(0)
+
+  @@unique([scheduleId, seatId])
+  @@unique([scheduleId, seatNumber])
+  @@index([lockExpiresAt, status])
+  @@map("seat_inventories")
+}
+
+<span class="hl-kw">model</span> <span class="hl-typ">SeatSegmentLock</span> {
+  id            <span class="hl-typ">String</span>     @id @default(uuid())
+  scheduleId    <span class="hl-typ">String</span>
+  seatId        <span class="hl-typ">String</span>
+  fromSeq       <span class="hl-typ">Int</span>        <span class="hl-cmt">// sequenceNumber of boarding station</span>
+  toSeq         <span class="hl-typ">Int</span>        <span class="hl-cmt">// sequenceNumber of alighting station</span>
+  status        <span class="hl-typ">SeatStatus</span> @default(LOCKED)
+  lockedBy      <span class="hl-typ">String?</span>
+  lockExpiresAt <span class="hl-typ">DateTime?</span>
+  bookingId     <span class="hl-typ">String?</span>
+
+  @@index([scheduleId, seatId, status])
+  @@index([lockExpiresAt, status])
+  @@map("seat_segment_locks")
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking DB Schema -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">booking-service/prisma/schema.prisma</span>
+            <span class="file-role-badge">Booking & Saga Domain DB</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Core Entities</h4>
+              <p><code>Booking</code> (master reservation status & sequence bounds), <code>BookingSeat</code> (junction of reserved berths), <code>Passenger</code> (manifest records), and <code>SagaLog</code> (state audit trail).</p>
+            </div>
+            <div class="meta-box">
+              <h4>Saga Audit Logging</h4>
+              <p>Every forward and compensating step writes to <code>SagaLog</code> with JSON request/response payloads, ensuring zero lost state during container restarts.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">Prisma Models: Booking, Passenger & SagaLog</span>
+            </div>
+            <pre><code><span class="hl-kw">enum</span> <span class="hl-typ">BookingStatus</span> {
+  PENDING
+  SEATS_HELD
+  PAYMENT_PENDING
+  CONFIRMING
+  CONFIRMED
+  CANCELLING
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+<span class="hl-kw">model</span> <span class="hl-typ">Booking</span> {
+  id             <span class="hl-typ">String</span>        @id @default(uuid())
+  userId         <span class="hl-typ">String</span>
+  scheduleId     <span class="hl-typ">String</span>
+  trainNumber    <span class="hl-typ">String</span>
+  trainName      <span class="hl-typ">String</span>
+  departureDate  <span class="hl-typ">DateTime</span>      @db.Date
+  status         <span class="hl-typ">BookingStatus</span> @default(PENDING)
+  totalAmount    <span class="hl-typ">Float</span>         @default(0)
+  seatCount      <span class="hl-typ">Int</span>
+  fromStationId  <span class="hl-typ">String?</span>
+  toStationId    <span class="hl-typ">String?</span>
+  fromSeq        <span class="hl-typ">Int?</span>
+  toSeq          <span class="hl-typ">Int?</span>
+  idempotencyKey <span class="hl-typ">String</span>        @unique
+  paymentOrderId <span class="hl-typ">String?</span>       @unique
+  lockExpiresAt  <span class="hl-typ">DateTime?</span>
+
+  seats      <span class="hl-typ">BookingSeat</span>[]
+  passengers <span class="hl-typ">Passenger</span>[]
+  sagaLog    <span class="hl-typ">SagaLog</span>[]
+
+  @@map("bookings")
+}
+
+<span class="hl-kw">model</span> <span class="hl-typ">SagaLog</span> {
+  id        <span class="hl-typ">String</span>         @id @default(uuid())
+  bookingId <span class="hl-typ">String</span>
+  step      <span class="hl-typ">SagaStep</span>       <span class="hl-cmt">// HOLD_SEATS, CREATE_PAYMENT, CONFIRM_SEATS, COMPLETE</span>
+  status    <span class="hl-typ">SagaStepStatus</span> @default(PENDING) <span class="hl-cmt">// PENDING, COMPLETED, COMPENSATED, FAILED</span>
+  request   <span class="hl-typ">Json?</span>
+  response  <span class="hl-typ">Json?</span>
+  error     <span class="hl-typ">String?</span>
+  createdAt <span class="hl-typ">DateTime</span>       @default(now())
+
+  booking   <span class="hl-typ">Booking</span>        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  @@map("saga_logs")
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment & Admin Schemas -->
+      <div class="code-module">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">payment-service & admin-service/prisma/schema.prisma</span>
+            <span class="file-role-badge">Payment & Master Topology DB</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Payment Service Models</h4>
+              <p><code>PaymentOrder</code> stores Razorpay <code>gatewayOrderId</code>, signature, and status (<code>CREATED</code>, <code>CAPTURED</code>, <code>REFUNDED</code>). <code>Refund</code> stores automated refund idempotency keys.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Admin Service Models</h4>
+              <p><code>Station</code> (code, city), <code>Train</code> (coach layout), <code>Seat</code> (seat types: LOWER, MIDDLE, UPPER, SIDE_LOWER, SIDE_UPPER), and <code>RouteStation</code> (ordered sequence numbers).</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">Prisma Models: PaymentOrder, Refund, Station & Train</span>
+            </div>
+            <pre><code><span class="hl-cmt">// Payment Service Schema</span>
+<span class="hl-kw">model</span> <span class="hl-typ">PaymentOrder</span> {
+  id               <span class="hl-typ">String</span>             @id @default(uuid())
+  bookingId        <span class="hl-typ">String</span>
+  userId           <span class="hl-typ">String</span>
+  amount           <span class="hl-typ">Float</span>
+  currency         <span class="hl-typ">String</span>             @default("INR")
+  status           <span class="hl-typ">PaymentOrderStatus</span> @default(CREATED)
+  idempotencyKey   <span class="hl-typ">String</span>             @unique
+  gatewayOrderId   <span class="hl-typ">String?</span>            @unique
+  gatewayPaymentId <span class="hl-typ">String?</span>            @unique
+  gatewaySignature <span class="hl-typ">String?</span>
+  refunds          <span class="hl-typ">Refund</span>[]
+  @@map("payment_orders")
+}
+
+<span class="hl-cmt">// Admin Service Route Topology Schema</span>
+<span class="hl-kw">model</span> <span class="hl-typ">RouteStation</span> {
+  id                  <span class="hl-typ">String</span>   @id @default(uuid())
+  routeId             <span class="hl-typ">String</span>
+  stationId           <span class="hl-typ">String</span>
+  sequenceNumber      <span class="hl-typ">Int</span>      <span class="hl-cmt">// 1, 2, 3, 4 (used for segment overlap checks)</span>
+  distanceFromOrigin  <span class="hl-typ">Float</span>
+  departureTime       <span class="hl-typ">String?</span>
+  arrivalTime         <span class="hl-typ">String?</span>
+  @@unique([routeId, sequenceNumber])
+  @@map("route_stations")
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 5: COMPLETE API GATEWAY ENDPOINT CATALOGUE
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="api-catalogue" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">05</span>
+          <h2 class="section-heading">Complete API Gateway Endpoint Catalogue</h2>
+        </div>
+        <p class="section-subtext">Every REST route exposed by the API Gateway with auth rules, rate limits, and request contracts</p>
+      </div>
+
+      <div class="ports-table-wrap">
+        <table class="ports-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Endpoint Path</th>
+              <th>Target Service</th>
+              <th>Auth & Rate Limit</th>
+              <th>Description & Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/users/auth/send-otp</code></td>
+              <td>User Service (4001)</td>
+              <td>Public · 5 req/hour</td>
+              <td>Generates crypto 6-digit OTP, saves bcrypt hash in Redis, sends email via Kafka.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/users/auth/verify-otp</code></td>
+              <td>User Service (4001)</td>
+              <td>Public · 10 req/hour</td>
+              <td>Verifies OTP hash. Issues signed JWT Access Token (15m) and Refresh Token (7d).</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/users/auth/login</code></td>
+              <td>User Service (4001)</td>
+              <td>Public · 100 req/15m</td>
+              <td>Password-based authentication with bcrypt password verification.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/users/auth/refresh</code></td>
+              <td>User Service (4001)</td>
+              <td>Public · 20 req/15m</td>
+              <td>Rotates single-use JTI in Redis. Protects against stolen token replays.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-get">GET</span></td>
+              <td><code>/api/users/user/profile</code></td>
+              <td>User Service (4001)</td>
+              <td><span class="port-badge">JWT Required</span></td>
+              <td>Fetches cached profile from Redis; falls back to PostgreSQL on cache miss.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-get">GET</span></td>
+              <td><code>/api/search/trains</code></td>
+              <td>Search Service (4002)</td>
+              <td>Public · Search Cache</td>
+              <td>Queries Elasticsearch 8 for routes matching origin/destination sequences and dates.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-get">GET</span></td>
+              <td><code>/api/search/stations/autocomplete</code></td>
+              <td>Search Service (4002)</td>
+              <td>Public · Sub-10ms</td>
+              <td>Edge n-gram fuzzy station name and code matching ("NDLS", "New Delhi").</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-get">GET</span></td>
+              <td><code>/api/inventory/schedules/:id/seats</code></td>
+              <td>Inventory (4007)</td>
+              <td>Public · Real-time</td>
+              <td>Returns real-time coach seat matrix filtered by segment bounds (<code>fromSeq/toSeq</code>).</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/bookings/initiate</code></td>
+              <td>Booking (4005)</td>
+              <td><span class="port-badge">JWT Required</span></td>
+              <td>Triggers Saga <code>HOLD_SEATS</code>. Holds seats via <code>FOR UPDATE NOWAIT</code> for 10 mins.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-get">GET</span></td>
+              <td><code>/api/bookings/:id</code></td>
+              <td>Booking (4005)</td>
+              <td><span class="port-badge">JWT Required</span></td>
+              <td>Returns booking details, remaining seat-hold TTL timer, and passenger manifests.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/bookings/:id/cancel</code></td>
+              <td>Booking (4005)</td>
+              <td><span class="port-badge">JWT Required</span></td>
+              <td>Executes Saga compensating transactions: issues Razorpay refund & unlocks seats.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/payments/orders</code></td>
+              <td>Payment (4006)</td>
+              <td><span class="port-badge">JWT Required</span></td>
+              <td>Creates Razorpay order with currency INR and unique idempotency key.</td>
+            </tr>
+            <tr>
+              <td><span class="http-method http-post">POST</span></td>
+              <td><code>/api/payments/webhooks/razorpay</code></td>
+              <td>Payment (4006)</td>
+              <td><strong>Raw Webhook Secret</strong></td>
+              <td>Bypasses standard JSON parsing in Gateway; validates raw HMAC SHA-256 signature.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 6: THE 13 KAFKA EVENT TOPICS & DLQ TOPOLOGY
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="kafka-streams" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">06</span>
+          <h2 class="section-heading">Kafka Event Streaming Topics & Dead Letter Queues</h2>
+        </div>
+        <p class="section-subtext">The complete event-driven communication catalogue defined in shared/constants/kafka-topics.js</p>
+      </div>
+
+      <div class="ports-table-wrap">
+        <table class="ports-table">
+          <thead>
+            <tr>
+              <th>Kafka Topic Name</th>
+              <th>Producer Service</th>
+              <th>Consumer Services</th>
+              <th>Payload Summary</th>
+              <th>Trigger & Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>notification.otp-email</code></td>
+              <td>User Service</td>
+              <td>Notification Service</td>
+              <td><code>{ email, otp, name }</code></td>
+              <td>Emitted when user requests sign-in OTP; renders HTML email asynchronously.</td>
+            </tr>
+            <tr>
+              <td><code>notification.welcome-email</code></td>
+              <td>User Service</td>
+              <td>Notification Service</td>
+              <td><code>{ email, firstName }</code></td>
+              <td>Emitted upon successful new account registration.</td>
+            </tr>
+            <tr>
+              <td><code>admin.train-created</code></td>
+              <td>Admin Service</td>
+              <td>Search Service</td>
+              <td><code>{ trainId, trainNumber, name }</code></td>
+              <td>Propagates new train definitions to search index.</td>
+            </tr>
+            <tr>
+              <td><code>admin.schedule-created</code></td>
+              <td>Admin Service</td>
+              <td>Inventory & Search Services</td>
+              <td><code>{ scheduleId, seats, route }</code></td>
+              <td>Initializes seat rows in Inventory Service and schedules in Elasticsearch.</td>
+            </tr>
+            <tr>
+              <td><code>admin.schedule-cancelled</code></td>
+              <td>Admin Service</td>
+              <td>Inventory & Search Services</td>
+              <td><code>{ scheduleId }</code></td>
+              <td>Cancels all seat rows and delists schedule from search queries.</td>
+            </tr>
+            <tr>
+              <td><code>inventory.seat-availability-updated</code></td>
+              <td>Inventory Service</td>
+              <td>Search Service</td>
+              <td><code>{ scheduleId, available, booked }</code></td>
+              <td>Broadcast whenever seats are held or confirmed; updates search cards live.</td>
+            </tr>
+            <tr>
+              <td><code>booking.confirmed</code></td>
+              <td>Booking Service</td>
+              <td>Notification Service</td>
+              <td><code>{ bookingId, pnr, seats, email }</code></td>
+              <td>Fires upon payment success; emails formal PDF e-ticket with seat berths.</td>
+            </tr>
+            <tr>
+              <td><code>booking.cancelled</code></td>
+              <td>Booking Service</td>
+              <td>Notification Service</td>
+              <td><code>{ bookingId, refundAmount }</code></td>
+              <td>Sends cancellation confirmation and refund status email to passenger.</td>
+            </tr>
+            <tr>
+              <td><code>booking.failed</code></td>
+              <td>Booking Service</td>
+              <td>Notification Service</td>
+              <td><code>{ bookingId, reason }</code></td>
+              <td>Alerts user when seat hold expires or payment fails during checkout.</td>
+            </tr>
+            <tr>
+              <td><code>dlq.booking-service</code></td>
+              <td>Booking Consumer</td>
+              <td>Ops Monitoring</td>
+              <td><code>{ failedMessage, error, retries }</code></td>
+              <td>Captures poison messages failing 3 consecutive retries in Booking Service.</td>
+            </tr>
+            <tr>
+              <td><code>dlq.inventory-service</code></td>
+              <td>Inventory Consumer</td>
+              <td>Ops Monitoring</td>
+              <td><code>{ failedMessage, error, retries }</code></td>
+              <td>Dead-letter queue for malformed schedule creation or seat sync events.</td>
+            </tr>
+            <tr>
+              <td><code>dlq.notification-service</code></td>
+              <td>Notification Consumer</td>
+              <td>Ops Monitoring</td>
+              <td><code>{ failedMessage, error, retries }</code></td>
+              <td>Holds failed email deliveries (e.g. invalid recipient domain) for re-delivery.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 7: END-TO-END BOOKING LIFECYCLE & STATE MACHINE
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="booking-lifecycle" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">07</span>
+          <h2 class="section-heading">End-to-End Booking Lifecycle & State Transitions</h2>
+        </div>
+        <p class="section-subtext">Chronological flow from route search to payment verification, seat allocation, and fallback rollbacks</p>
+      </div>
+
+      <div class="funnel-step-list">
+        <!-- Step 1 -->
+        <div class="funnel-step-card">
+          <div class="funnel-badge">01</div>
+          <div class="funnel-content">
+            <h4>Route Search & Fuzzy Matching</h4>
+            <p>
+              Traveler enters origin station, destination station, and travel date on the React frontend. The request routes to <code>GET /api/search/trains</code>. Elasticsearch runs a sequence traversal query finding schedules where <code>fromStation.sequence &lt; toStation.sequence</code>, returning available trains in under 15ms.
+            </p>
+            <div class="funnel-tech-tags">
+              <span class="tech-tag">Elasticsearch 8</span>
+              <span class="tech-tag">Edge N-Gram</span>
+              <span class="tech-tag">API Gateway Proxy</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="funnel-step-card">
+          <div class="funnel-badge">02</div>
+          <div class="funnel-content">
+            <h4>Interactive Coach Seat Map & Segment Availability</h4>
+            <p>
+              User selects a train and opens the Coach Seat Map. The client queries <code>GET /api/inventory/schedules/:id/seats?fromSeq=1&toSeq=3</code>. The Inventory Service queries <code>seat_segment_locks</code> to check interval overlap. If a seat is booked only from Station 3 to 5, it displays as <strong>GREEN (AVAILABLE)</strong> for this user!
+            </p>
+            <div class="funnel-tech-tags">
+              <span class="tech-tag">Zustand Store</span>
+              <span class="tech-tag">Segment Algebra</span>
+              <span class="tech-tag">Coach Layout Visualizer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="funnel-step-card">
+          <div class="funnel-badge">03</div>
+          <div class="funnel-content">
+            <h4>Seat Hold & Saga Orchestration Kickoff</h4>
+            <p>
+              User selects Seat 14A (LOWER) and clicks "Proceed to Book". The client issues <code>POST /api/bookings/initiate</code>. The Booking Service generates a UUID booking record in status <code>PENDING</code> and triggers <code>executeHoldSeats()</code>.
+              The Inventory Service executes <code>SELECT id FROM seat_inventories WHERE ... FOR UPDATE NOWAIT</code>. If acquired, status advances to <code>SEATS_HELD</code> with a <strong>10-minute lock TTL</strong>.
+            </p>
+            <div class="funnel-tech-tags">
+              <span class="tech-tag">Postgres FOR UPDATE NOWAIT</span>
+              <span class="tech-tag">SagaLog PENDING</span>
+              <span class="tech-tag">Lock TTL Timer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="funnel-step-card">
+          <div class="funnel-badge">04</div>
+          <div class="funnel-content">
+            <h4>Razorpay Payment Gateway Checkout</h4>
+            <p>
+              Saga step 2 executes <code>executeCreatePayment()</code>. The Payment Service invokes Razorpay SDK to create an official order with currency INR. The booking status advances to <code>PAYMENT_PENDING</code>. The frontend launches the Razorpay modal with a real-time countdown clock displaying the remaining seat hold time.
+            </p>
+            <div class="funnel-tech-tags">
+              <span class="tech-tag">Razorpay Node SDK</span>
+              <span class="tech-tag">Idempotency Key</span>
+              <span class="tech-tag">Frontend Countdown Hook</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="funnel-step-card">
+          <div class="funnel-badge">05</div>
+          <div class="funnel-content">
+            <h4>Raw HMAC Webhook Verification & Ticket Confirmation</h4>
+            <p>
+              User completes UPI/Card payment. Razorpay posts an encrypted webhook to <code>/api/payments/webhooks/razorpay</code>. The API Gateway preserves the raw byte stream, and the Payment Service validates <code>crypto.createHmac('sha256', secret).update(rawBody).digest('hex')</code>. 
+              The Saga completes step 3 (<code>CONFIRM_SEATS</code>), marking seats as <code>BOOKED</code> and booking as <code>CONFIRMED</code>.
+            </p>
+            <div class="funnel-tech-tags">
+              <span class="tech-tag">HMAC-SHA256</span>
+              <span class="tech-tag">Raw Byte Middleware</span>
+              <span class="tech-tag">Atomic State Machine</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="funnel-step-card">
+          <div class="funnel-badge">06</div>
+          <div class="funnel-content">
+            <h4>Asynchronous Kafka Broadcast & Ticket Dispatch</h4>
+            <p>
+              Booking Service publishes <code>booking.confirmed</code> to Apache Kafka. The Notification Service consumes the event and renders an HTML e-ticket with PNR number, coach berth, and passenger details. The Search Service updates its live seat count without blocking the user's confirmation screen.
+            </p>
+            <div class="funnel-tech-tags">
+              <span class="tech-tag">Apache Kafka</span>
+              <span class="tech-tag">Nodemailer HTML Template</span>
+              <span class="tech-tag">Non-blocking User Experience</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 8: CODEBASE WALKTHROUGH
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="codebase" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">08</span>
+          <h2 class="section-heading">Exhaustive Codebase Walkthrough</h2>
+        </div>
+        <p class="section-subtext">Click any service module to inspect core implementations, architectural design decisions, and critical lines of code</p>
+      </div>
+
+      <!-- MODULE 1: INVENTORY SERVICE (ROW LOCKING & SEGMENT BOOKING) -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">inventory-service/src/services/inventory.service.js</span>
+            <span class="file-role-badge">High-Concurrency Locking Core</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>What Problem It Solves</h4>
+              <p>Eliminates seat double-booking under extreme concurrent requests while supporting segment-based seat reuse (booking Delhi-to-Jaipur and Jaipur-to-Mumbai on the same seat).</p>
+            </div>
+            <div class="meta-box">
+              <h4>Key Architectural Patterns</h4>
+              <p>PostgreSQL <code>FOR UPDATE NOWAIT</code>, segment overlap math, transaction retries with exponential backoff, and aggregate counter recalibration to prevent counter drift.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">inventory-service/src/services/inventory.service.js (lockSeats implementation)</span>
+            </div>
+            <pre><code><span class="hl-kw">const</span> lockSeats = <span class="hl-kw">async</span> (scheduleId, seatIds, userId, ttlSeconds, fromSeq, toSeq) => {
+  <span class="hl-kw">const</span> ttl = Math.<span class="hl-fn">min</span>(Math.<span class="hl-fn">max</span>(ttlSeconds || config.LOCK_TTL_SECONDS, <span class="hl-num">60</span>), <span class="hl-num">600</span>);
+  <span class="hl-kw">const</span> lockExpiresAt = <span class="hl-kw">new</span> <span class="hl-fn">Date</span>(Date.<span class="hl-fn">now</span>() + ttl * <span class="hl-num">1000</span>);
+
+  <span class="hl-kw">return</span> <span class="hl-fn">retryTransaction</span>(<span class="hl-kw">async</span> () => {
+    <span class="hl-kw">return</span> prisma.<span class="hl-fn">$transaction</span>(<span class="hl-kw">async</span> (tx) => {
+      <span class="hl-cmt">// 1. Acquire exclusive row lock immediately without blocking connection pool</span>
+      <span class="hl-kw">const</span> seats = <span class="hl-kw">await</span> tx.<span class="hl-fn">$queryRaw</span>`
+        SELECT id, "seatId", "seatNumber", status, "lockedBy"
+        FROM seat_inventories
+        WHERE "scheduleId" = ${scheduleId}
+        AND "seatId" = ANY(${seatIds}::text[])
+        FOR UPDATE NOWAIT
+      `;
+
+      <span class="hl-cmt">// 2. SEGMENT BOOKING: Check for overlapping locks in the requested segment</span>
+      <span class="hl-kw">if</span> (fromSeq && toSeq) {
+        <span class="hl-kw">const</span> overlapping = <span class="hl-kw">await</span> tx.<span class="hl-fn">$queryRaw</span>`
+          SELECT "seatId" FROM seat_segment_locks
+          WHERE "scheduleId" = ${scheduleId}
+          AND "seatId" = ANY(${seatIds}::text[])
+          AND status IN ('LOCKED', 'BOOKED')
+          AND "fromSeq" &lt; ${toSeq}
+          AND "toSeq" &gt; ${fromSeq}
+          FOR UPDATE NOWAIT
+        `;
+
+        <span class="hl-kw">if</span> (overlapping.length > <span class="hl-num">0</span>) {
+          <span class="hl-kw">throw new</span> <span class="hl-fn">ConflictError</span>(<span class="hl-str">'Seats already locked for overlapping segment'</span>);
+        }
+
+        <span class="hl-cmt">// 3. Persist segment locks for each seat</span>
+        <span class="hl-kw">for</span> (<span class="hl-kw">const</span> seat <span class="hl-kw">of</span> seats) {
+          <span class="hl-kw">await</span> tx.seatSegmentLock.<span class="hl-fn">create</span>({
+            data: { scheduleId, seatId: seat.seatId, fromSeq, toSeq, status: <span class="hl-str">'LOCKED'</span>, lockedBy: userId, lockExpiresAt }
+          });
+        }
+      }
+      <span class="hl-cmt">// 4. Recalculate and update schedule availability aggregates</span>
+      <span class="hl-kw">return</span> { scheduleId, lockExpiresAt, lockedSeats: seatIds };
+    });
+  });
+};</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 2: BOOKING SERVICE (SAGA ORCHESTRATOR) -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">booking-service/src/services/saga.service.js</span>
+            <span class="file-role-badge">Distributed Transaction Orchestrator</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>What Problem It Solves</h4>
+              <p>Coordinates multi-service distributed transactions (Seat Hold $\rightarrow$ Payment Order $\rightarrow$ Seat Confirmation) without 2PC blocking locks.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Crash Recovery & Rollback Design</h4>
+              <p>Logs every forward step to the <code>SagaLog</code> table. On failure, <code>compensateAll()</code> reads completed steps in reverse order to initiate Razorpay refunds and release held seats.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">booking-service/src/services/saga.service.js (Forward & Compensating Logic)</span>
+            </div>
+            <pre><code><span class="hl-cmt">// Step 1: Forward Seat Hold</span>
+<span class="hl-kw">async function</span> <span class="hl-fn">executeHoldSeats</span>(booking, seatIds, ttlSeconds, fromSeq, toSeq) {
+  <span class="hl-kw">const</span> sagaLog = <span class="hl-kw">await</span> prisma.sagaLog.<span class="hl-fn">create</span>({
+    data: { bookingId: booking.id, step: <span class="hl-str">'HOLD_SEATS'</span>, status: <span class="hl-str">'PENDING'</span> }
+  });
+  <span class="hl-kw">try</span> {
+    <span class="hl-kw">const</span> result = <span class="hl-kw">await</span> inventoryClient.<span class="hl-fn">holdSeats</span>(booking.scheduleId, seatIds, booking.userId, ttlSeconds, fromSeq, toSeq);
+    <span class="hl-kw">await</span> prisma.sagaLog.<span class="hl-fn">update</span>({ where: { id: sagaLog.id }, data: { status: <span class="hl-str">'COMPLETED'</span>, response: result } });
+    <span class="hl-kw">return</span> result;
+  } <span class="hl-kw">catch</span> (error) {
+    <span class="hl-kw">await</span> prisma.sagaLog.<span class="hl-fn">update</span>({ where: { id: sagaLog.id }, data: { status: <span class="hl-str">'FAILED'</span>, error: error.message } });
+    <span class="hl-kw">throw</span> error;
+  }
+}
+
+<span class="hl-cmt">// Step 2: Reverse Compensating Rollback</span>
+<span class="hl-kw">async function</span> <span class="hl-fn">compensateAll</span>(booking, seatIds) {
+  <span class="hl-kw">const</span> completedSteps = <span class="hl-kw">await</span> prisma.sagaLog.<span class="hl-fn">findMany</span>({
+    where: { bookingId: booking.id, status: <span class="hl-str">'COMPLETED'</span> },
+    orderBy: { createdAt: <span class="hl-str">'desc'</span> } <span class="hl-cmt">// Reverse order!</span>
+  });
+
+  <span class="hl-kw">for</span> (<span class="hl-kw">const</span> step <span class="hl-kw">of</span> completedSteps) {
+    <span class="hl-kw">if</span> (step.step === <span class="hl-str">'CONFIRM_SEATS'</span>) <span class="hl-kw">await</span> <span class="hl-fn">compensateConfirmSeats</span>(booking);
+    <span class="hl-kw">if</span> (step.step === <span class="hl-str">'CREATE_PAYMENT'</span>) <span class="hl-kw">await</span> <span class="hl-fn">compensateCreatePayment</span>(booking);
+    <span class="hl-kw">if</span> (step.step === <span class="hl-str">'HOLD_SEATS'</span>) <span class="hl-kw">await</span> <span class="hl-fn">compensateHoldSeats</span>(booking, seatIds);
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 3: LOCK EXPIRY & ADVISORY LEADERSHIP -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">inventory-service/src/utils/lockExpiry.js</span>
+            <span class="file-role-badge">Distributed Advisory Lock Leader</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Leader Election via Advisory Locks</h4>
+              <p>Multiple container instances of Inventory Service run simultaneously. Using <code>SELECT pg_try_advisory_lock(800001)</code> ensures only one instance cleans expired locks per cycle.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Graceful Seat Re-allocation</h4>
+              <p>When user payment times out (e.g. 10 minutes), expired segment locks are deleted, seats return to <code>AVAILABLE</code>, and updated counts are broadcast over Kafka.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">inventory-service/src/utils/lockExpiry.js</span>
+            </div>
+            <pre><code><span class="hl-kw">const</span> ADVISORY_LOCK_ID = <span class="hl-num">800001</span>;
+
+<span class="hl-kw">async function</span> <span class="hl-fn">tryAcquireLeadership</span>() {
+  <span class="hl-kw">const</span> result = <span class="hl-kw">await</span> prisma.<span class="hl-fn">$queryRaw</span>`SELECT pg_try_advisory_lock(${ADVISORY_LOCK_ID}) AS acquired`;
+  <span class="hl-kw">return</span> result[<span class="hl-num">0</span>].acquired === <span class="hl-kw">true</span>;
+}
+
+<span class="hl-kw">async function</span> <span class="hl-fn">cleanExpiredLocks</span>() {
+  <span class="hl-kw">const</span> isLeader = <span class="hl-kw">await</span> <span class="hl-fn">tryAcquireLeadership</span>();
+  <span class="hl-kw">if</span> (!isLeader) <span class="hl-kw">return</span>; <span class="hl-cmt">// Skip if another instance is already running cleanup</span>
+
+  <span class="hl-kw">try</span> {
+    <span class="hl-cmt">// Find expired segment locks past TTL</span>
+    <span class="hl-kw">const</span> expired = <span class="hl-kw">await</span> prisma.seatSegmentLock.<span class="hl-fn">findMany</span>({
+      where: { status: <span class="hl-str">'LOCKED'</span>, lockExpiresAt: { lt: <span class="hl-kw">new</span> <span class="hl-fn">Date</span>() } }
+    });
+    <span class="hl-cmt">// Delete locks & recompute seat statuses</span>
+    <span class="hl-kw">await</span> prisma.<span class="hl-fn">$executeRaw</span>`DELETE FROM seat_segment_locks WHERE id = ANY(${expired.map(l => l.id)}::text[])`;
+  } <span class="hl-kw">finally</span> {
+    <span class="hl-kw">await</span> prisma.<span class="hl-fn">$queryRaw</span>`SELECT pg_advisory_unlock(${ADVISORY_LOCK_ID})`;
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 4: USER SERVICE (REDIS REFRESH TOKEN ROTATION & OTP) -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">user-service/src/services/auth.service.js & utils/otp.js</span>
+            <span class="file-role-badge">Authentication & Redis Security</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Refresh Token JTI Rotation</h4>
+              <p>Issues single-use refresh tokens stored as <code>refresh:{userId}:{deviceId} -> jti</code> in Redis. If a token is stolen and reused, the previous session is immediately revoked.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Sliding Window OTP Protection</h4>
+              <p>Restricts OTP requests to 5 per hour per email, storing bcrypt hashes in Redis with a 5-minute auto-expiry window and max 3 verification attempts.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">user-service/src/services/auth.service.js</span>
+            </div>
+            <pre><code><span class="hl-cmt">// Generate cryptographic JTI token for device session tracking</span>
+<span class="hl-kw">const</span> jti = crypto.<span class="hl-fn">randomUUID</span>();
+<span class="hl-kw">const</span> refreshToken = jwt.<span class="hl-fn">sign</span>({ id: user.id, deviceId, jti }, config.REFRESH_TOKEN_SECRET);
+
+<span class="hl-cmt">// Store in Redis with explicit TTL matching token lifetime</span>
+<span class="hl-kw">await</span> redis.<span class="hl-fn">set</span>(<span class="hl-str">`refresh:${user.id}:${deviceId}`</span>, jti, <span class="hl-str">'EX'</span>, config.REFRESH_TOKEN_EXP_SEC);
+<span class="hl-kw">await</span> redis.<span class="hl-fn">set</span>(<span class="hl-str">`user:${user.id}`</span>, JSON.<span class="hl-fn">stringify</span>(safeUser), <span class="hl-str">'EX'</span>, config.REDIS_USER_TTL);</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 5: REDIS ATOMIC MULTI-KEY DISTRIBUTED LOCKS -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">booking-service/src/utils/distributedLock.js</span>
+            <span class="file-role-badge">Atomic Lua Distributed Lock Core</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Deadlock Prevention Algorithm</h4>
+              <p>Sorts seat keys lexicographically (<code>[...seatIds].sort()</code>) to guarantee all concurrent workers acquire locks in identical global order, eliminating circular wait conditions.</p>
+            </div>
+            <div class="meta-box">
+              <h4>All-or-Nothing Atomic Rollback</h4>
+              <p>Runs a custom Lua script inside Redis. If even one seat in the reservation is unavailable, Lua unrolls and deletes all previously acquired keys in that transaction, returning 0 without network round-trips.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">booking-service/src/utils/distributedLock.js (Atomic Lua Script)</span>
+            </div>
+            <pre><code><span class="hl-cmt">// Lua script: Atomic multi-key acquisition with instant rollback on collision</span>
+<span class="hl-kw">const</span> ACQUIRE_SCRIPT = <span class="hl-str">`
+local lockValue = ARGV[1]
+local ttl = tonumber(ARGV[2])
+local acquired = {}
+
+for i, key in ipairs(KEYS) do
+  local result = redis.call('SET', key, lockValue, 'NX', 'EX', ttl)
+  if not result then
+    -- Rollback: release all previously acquired locks in this atomic execution
+    for j = 1, #acquired do
+      redis.call('DEL', acquired[j])
+    end
+    return 0
+  end
+  table.insert(acquired, key)
+end
+return 1
+`</span>;
+
+<span class="hl-cmt">// Safe release: only delete if lock ownership value matches</span>
+<span class="hl-kw">const</span> RELEASE_SCRIPT = <span class="hl-str">`
+local lockValue = ARGV[1]
+local released = 0
+for i, key in ipairs(KEYS) do
+  if redis.call('GET', key) == lockValue then
+    redis.call('DEL', key)
+    released = released + 1
+  end
+end
+return released
+`</span>;
+
+<span class="hl-kw">async function</span> <span class="hl-fn">acquireSeatLocks</span>(scheduleId, seatIds, bookingId, ttlSeconds, fromSeq, toSeq) {
+  <span class="hl-kw">const</span> keys = [...seatIds].<span class="hl-fn">sort</span>().<span class="hl-fn">map</span>(id => <span class="hl-str">`booking:lock:seat:${scheduleId}:${id}${fromSeq && toSeq ? \`:${fromSeq}:${toSeq}\` : ''}`</span>);
+  <span class="hl-kw">const</span> lockValue = <span class="hl-str">`${bookingId}:${Date.now()}`</span>;
+  <span class="hl-kw">const</span> result = <span class="hl-kw">await</span> redis.<span class="hl-fn">eval</span>(ACQUIRE_SCRIPT, keys.length, ...keys, lockValue, ttlSeconds);
+  <span class="hl-kw">return</span> { acquired: result === <span class="hl-num">1</span>, lockValue };
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 6: BOOKING EXPIRY & OPTIMISTIC CONCURRENCY CONTROL -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">booking-service/src/utils/bookingExpiry.js</span>
+            <span class="file-role-badge">Leader Election & CAS Versioning Engine</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Redis Lease Leader Election</h4>
+              <p>Uses <code>redis.set(LEADER_KEY, pid, 'NX', 'EX', 25)</code> so only one container instance across all horizontal replicas scans for expired bookings, preventing duplicate database load.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Compare-And-Swap (CAS) Race Defense</h4>
+              <p>Updates booking status conditioned on <code>version: booking.version</code>. If a concurrent Razorpay webhook confirms payment at the exact same second, the version increment causes the expiry job to yield safely.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">booking-service/src/utils/bookingExpiry.js (CAS Cleanup Execution)</span>
+            </div>
+            <pre><code><span class="hl-kw">async function</span> <span class="hl-fn">cleanExpiredBookings</span>() {
+  <span class="hl-cmt">// 1. Elect single leader across all horizontal replicas</span>
+  <span class="hl-kw">const</span> isLeader = <span class="hl-kw">await</span> <span class="hl-fn">tryAcquireLeadership</span>();
+  <span class="hl-kw">if</span> (!isLeader) <span class="hl-kw">return</span>;
+
+  <span class="hl-kw">const</span> expiredBookings = <span class="hl-kw">await</span> prisma.booking.<span class="hl-fn">findMany</span>({
+    where: { status: { in: [<span class="hl-str">'PENDING'</span>, <span class="hl-str">'SEATS_HELD'</span>, <span class="hl-str">'PAYMENT_PENDING'</span>] }, lockExpiresAt: { lt: <span class="hl-kw">new</span> <span class="hl-fn">Date</span>() } },
+    include: { seats: <span class="hl-kw">true</span> }
+  });
+
+  <span class="hl-kw">for</span> (<span class="hl-kw">const</span> booking <span class="hl-kw">of</span> expiredBookings) {
+    <span class="hl-cmt">// 2. Optimistic Concurrency Control (CAS): Atomic claim checking version</span>
+    <span class="hl-kw">const</span> claimed = <span class="hl-kw">await</span> prisma.booking.<span class="hl-fn">updateMany</span>({
+      where: { id: booking.id, version: booking.version, status: { in: [<span class="hl-str">'PENDING'</span>, <span class="hl-str">'SEATS_HELD'</span>, <span class="hl-str">'PAYMENT_PENDING'</span>] } },
+      data: { status: <span class="hl-str">'EXPIRED'</span>, failureReason: <span class="hl-str">'booking_timeout'</span>, version: { increment: <span class="hl-num">1</span> } }
+    });
+
+    <span class="hl-cmt">// If payment webhook already incremented version, claimed.count is 0 -> skip!</span>
+    <span class="hl-kw">if</span> (claimed.count === <span class="hl-num">0</span>) <span class="hl-kw">continue</span>;
+
+    <span class="hl-cmt">// 3. Compensate all completed saga steps & release distributed seat locks</span>
+    <span class="hl-kw">await</span> <span class="hl-fn">compensateAll</span>(booking.id);
+    <span class="hl-kw">await</span> <span class="hl-fn">forceReleaseSeatLocks</span>(booking.scheduleId, booking.seats.<span class="hl-fn">map</span>(s => s.seatId));
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 7: ELASTICSEARCH 8 SEARCH & PAINLESS SCRIPTING -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">search-service/src/services/search.service.js</span>
+            <span class="file-role-badge">Elasticsearch 8 Suggesters & In-Place Painless Updates</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Autocomplete Completion Suggesters</h4>
+              <p>Indexes stations with weighted suggest inputs (<code>[station.name, station.code, station.city]</code>) for sub-millisecond prefix querying across Indian Railway station codes.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Atomic In-Place Painless Scripts</h4>
+              <p>Updates train schedule availability arrays in-place using Painless scripts without full document re-indexing, handling real-time seat decrement events emitted over Kafka.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">search-service/src/services/search.service.js (In-Place Painless Updates & Route Queries)</span>
+            </div>
+            <pre><code><span class="hl-cmt">// Atomic in-place schedule insertion via Elasticsearch Painless script</span>
+<span class="hl-kw">const</span> updateSeatAvailability = <span class="hl-kw">async</span> (event) => {
+  <span class="hl-kw">const</span> { scheduleId, trainId, available, locked, booked } = event;
+  <span class="hl-kw">await</span> esClient.<span class="hl-fn">update</span>({
+    index: TRAIN_INDEX,
+    id: trainId,
+    script: {
+      source: <span class="hl-str">`
+        if (ctx._source.schedules != null) {
+          for (def s : ctx._source.schedules) {
+            if (s.scheduleId == params.scheduleId) {
+              s.available = params.available;
+              s.locked    = params.locked;
+              s.booked    = params.booked;
+            }
+          }
+        }
+      `</span>,
+      params: { scheduleId, available, locked, booked }
+    },
+    refresh: <span class="hl-kw">true</span>
+  });
+};
+
+<span class="hl-cmt">// Bidirectional Route Query: Matches both stations & validates direction (fromSeq &lt; toSeq)</span>
+<span class="hl-kw">const</span> results = <span class="hl-kw">await</span> esClient.<span class="hl-fn">search</span>({
+  index: TRAIN_INDEX,
+  query: {
+    bool: {
+      must: [
+        { nested: { path: <span class="hl-str">'route'</span>, query: { term: { <span class="hl-str">'route.stationId'</span>: fromStation.stationId } } } },
+        { nested: { path: <span class="hl-str">'route'</span>, query: { term: { <span class="hl-str">'route.stationId'</span>: toStation.stationId } } } }
+      ]
+    }
+  }
+});</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 8: PAYMENT GATEWAY FACTORY & RAW BYTE WEBHOOK PIPELINE -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">payment-service/src/services/gateways/gateway.factory.js & api-gateway/src/index.js</span>
+            <span class="file-role-badge">PSP Factory Pattern & Raw Stream Preserving Middleware</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Polymorphic PSP Strategy Pattern</h4>
+              <p>Implements <code>BaseGateway</code> abstract class. Concrete subclasses (<code>RazorpayGateway</code>, future <code>StripeGateway</code>) are instantiated via a singleton factory based on environment configuration.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Raw Byte Webhook Preservation</h4>
+              <p>API Gateway intercepts the webhook route with <code>express.raw({ type: 'application/json' })</code>, preserving uncorrupted byte stream required for HMAC-SHA256 signature verification.</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">Gateway Factory & Raw Byte Stream Verification</span>
+            </div>
+            <pre><code><span class="hl-cmt">// 1. API Gateway: Bypass JSON re-serialization to preserve raw binary stream</span>
+app.<span class="hl-fn">use</span>((req, res, next) => {
+  <span class="hl-kw">if</span> (req.path === <span class="hl-str">'/api/payments/webhooks/razorpay'</span>) {
+    <span class="hl-kw">return</span> express.<span class="hl-fn">raw</span>({ type: <span class="hl-str">'application/json'</span> })(req, res, next);
+  }
+  express.<span class="hl-fn">json</span>()(req, res, next);
+});
+
+<span class="hl-cmt">// 2. Payment Service: Cryptographic HMAC validation against unparsed raw body</span>
+<span class="hl-fn">verifyWebhookSignature</span>(rawBody, signature) {
+  <span class="hl-kw">const</span> expectedSignature = crypto
+    .<span class="hl-fn">createHmac</span>(<span class="hl-str">'sha256'</span>, <span class="hl-kw">this</span>.webhookSecret)
+    .<span class="hl-fn">update</span>(rawBody)
+    .<span class="hl-fn">digest</span>(<span class="hl-str">'hex'</span>);
+  <span class="hl-kw">return</span> crypto.<span class="hl-fn">timingSafeEqual</span>(Buffer.<span class="hl-fn">from</span>(expectedSignature), Buffer.<span class="hl-fn">from</span>(signature));
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 9: DEAD LETTER QUEUE (DLQ) RESILIENCE WRAPPER -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">shared/utils/dlqHandler.js</span>
+            <span class="file-role-badge">Poison Pill Isolation & DLQ Routing Wrapper</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Higher-Order Consumer Wrapper</h4>
+              <p>Wraps KafkaJS <code>eachMessage</code> handler. Tracks retry attempts per message key (<code>topic:partition:offset</code>) in memory to isolate unparseable poison pills.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Dead-Letter Forwarding with Metadata</h4>
+              <p>When retry threshold (<code>DLQ_MAX_RETRIES = 3</code>) is exceeded, routes payload to dedicated DLQ topic with diagnostic headers (<code>dlq-original-topic</code>, <code>dlq-error</code>, <code>dlq-timestamp</code>).</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">shared/utils/dlqHandler.js (withDLQ Implementation)</span>
+            </div>
+            <pre><code><span class="hl-kw">function</span> <span class="hl-fn">withDLQ</span>(producer, dlqTopic, logger, handler) {
+  <span class="hl-kw">const</span> retryMap = <span class="hl-kw">new</span> <span class="hl-fn">Map</span>();
+
+  <span class="hl-kw">return async</span> ({ topic, partition, message }) => {
+    <span class="hl-kw">const</span> msgKey = <span class="hl-str">`${topic}:${partition}:${message.offset}`</span>;
+    <span class="hl-kw">const</span> attempt = (retryMap.<span class="hl-fn">get</span>(msgKey) || <span class="hl-num">0</span>) + <span class="hl-num">1</span>;
+    retryMap.<span class="hl-fn">set</span>(msgKey, attempt);
+
+    <span class="hl-kw">try</span> {
+      <span class="hl-kw">const</span> parsedValue = JSON.<span class="hl-fn">parse</span>(message.value.<span class="hl-fn">toString</span>());
+      <span class="hl-kw">await</span> <span class="hl-fn">handler</span>({ topic, partition, message, parsedValue });
+      retryMap.<span class="hl-fn">delete</span>(msgKey);
+    } <span class="hl-kw">catch</span> (error) {
+      <span class="hl-kw">if</span> (attempt >= DLQ_MAX_RETRIES) {
+        <span class="hl-kw">await</span> producer.<span class="hl-fn">send</span>({
+          topic: dlqTopic,
+          messages: [{
+            key: message.key, value: message.value,
+            headers: { ...message.headers, <span class="hl-str">'dlq-original-topic'</span>: topic, <span class="hl-str">'dlq-error'</span>: error.message }
+          }]
+        });
+        retryMap.<span class="hl-fn">delete</span>(msgKey);
+      } <span class="hl-kw">else</span> {
+        <span class="hl-kw">throw</span> error; <span class="hl-cmt">// Re-throw so KafkaJS retries</span>
+      }
+    }
+  };
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 10: FRONTEND RESILIENCY & SILENT TOKEN ROTATION -->
+      <div class="code-module open">
+        <div class="module-header" onclick="toggleModule(this)">
+          <div class="module-title-area">
+            <span class="file-path">frontend/src/api/client.js & components/seats/SeatGrid.jsx</span>
+            <span class="file-role-badge">Axios 401 Mutex Queue & Interactive Coach Grid</span>
+          </div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-meta-grid">
+            <div class="meta-box">
+              <h4>Silent Refresh Mutex with Request Queue</h4>
+              <p>When multiple parallel frontend queries receive 401s, an interceptor mutex queues pending requests in <code>failedQueue</code>, triggers <code>/api/users/auth/refresh</code>, and replays all queued calls transparently.</p>
+            </div>
+            <div class="meta-box">
+              <h4>Interactive Indian Railway Coach Map</h4>
+              <p>Renders complete 72-seat railway coach matrices with color-coded berths (Lower, Middle, Upper, Side Lower, Side Upper) and real-time status badges (Available, Locked, Booked, Selected).</p>
+            </div>
+          </div>
+
+          <div class="code-snippet-wrap">
+            <div class="code-snippet-header">
+              <span class="code-snippet-title">frontend/src/api/client.js (Axios 401 Queueing Interceptor)</span>
+            </div>
+            <pre><code><span class="hl-kw">let</span> isRefreshing = <span class="hl-kw">false</span>;
+<span class="hl-kw">let</span> failedQueue = [];
+
+client.interceptors.response.<span class="hl-fn">use</span>(
+  (res) => res,
+  <span class="hl-kw">async</span> (error) => {
+    <span class="hl-kw">const</span> originalRequest = error.config;
+    <span class="hl-kw">if</span> (error.response?.status === <span class="hl-num">401</span> && !originalRequest._retry) {
+      <span class="hl-kw">if</span> (isRefreshing) {
+        <span class="hl-kw">return new</span> <span class="hl-fn">Promise</span>((resolve, reject) => failedQueue.<span class="hl-fn">push</span>({ resolve, reject }))
+          .<span class="hl-fn">then</span>(() => <span class="hl-fn">client</span>(originalRequest));
+      }
+      originalRequest._retry = <span class="hl-kw">true</span>;
+      isRefreshing = <span class="hl-kw">true</span>;
+      <span class="hl-kw">try</span> {
+        <span class="hl-kw">await</span> axios.<span class="hl-fn">post</span>(<span class="hl-str">\`\${API_BASE}/users/auth/refresh\`</span>, {}, { withCredentials: <span class="hl-kw">true</span> });
+        failedQueue.<span class="hl-fn">forEach</span>(({ resolve }) => <span class="hl-fn">resolve</span>());
+        <span class="hl-kw">return</span> <span class="hl-fn">client</span>(originalRequest);
+      } <span class="hl-kw">catch</span> (refreshErr) {
+        window.<span class="hl-fn">dispatchEvent</span>(<span class="hl-kw">new</span> <span class="hl-fn">Event</span>(<span class="hl-str">'auth:logout'</span>));
+        <span class="hl-kw">return</span> Promise.<span class="hl-fn">reject</span>(refreshErr);
+      } <span class="hl-kw">finally</span> {
+        isRefreshing = <span class="hl-kw">false</span>;
+        failedQueue = [];
+      }
+    }
+    <span class="hl-kw">return</span> Promise.<span class="hl-fn">reject</span>(error);
+  }
+);</code></pre>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 9: SENIOR ARCHITECT INTERVIEW CHEAT SHEET (16 QUESTIONS)
+         ═══════════════════════════════════════════════════════════════ -->
+    <section id="interview-qa" class="doc-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-num">09</span>
+          <h2 class="section-heading">Senior Engineer & System Design Interview Q&A</h2>
+        </div>
+        <p class="section-subtext">16 high-impact questions Principal Engineers and Hiring Managers will ask, and how to deliver compelling answers</p>
+      </div>
+
+      <!-- Question 1 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q1</span>
+          <span>How do you guarantee two concurrent users don't book the exact same train seat at the same millisecond?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Through Pessimistic Row-Level Locking with <code>NOWAIT</code> inside a PostgreSQL ACID transaction, combined with an exponential backoff retry strategy."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            When a user requests a seat hold, the Inventory Service initiates a database transaction executing <code>SELECT id FROM seat_inventories WHERE ... FOR UPDATE NOWAIT</code>. 
+          </p>
+          <p style="margin-top:0.5rem;">
+            If another transaction currently holds the row lock, PostgreSQL immediately throws an error (error code <code>55P03</code>) rather than blocking the thread pool. The request enters an in-memory <code>retryTransaction</code> loop with exponential jitter (100ms, 200ms, 400ms). If the seat cannot be locked within 3 retries, we return an HTTP 409 Conflict with code <code>SEATS_UNAVAILABLE</code>.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Proves you know the difference between blocking locks (which exhaust connection pools) and non-blocking <code>NOWAIT</code> with retries under high concurrency.
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q2</span>
+          <span>How do you handle distributed transactions across multiple microservices without Two-Phase Commit (2PC)?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"By implementing an Orchestration-based Saga pattern backed by a persistent SagaLog audit table."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            Two-Phase Commit introduces high latency, synchronous blocking, and single points of failure. In TrainTravel, the <strong>Booking Service acts as the Saga Orchestrator</strong>:
+          </p>
+          <p style="margin-top:0.5rem;">
+            1. <strong>Forward Flow:</strong> It sequentially calls <code>HOLD_SEATS</code> in Inventory Service $\rightarrow$ <code>CREATE_PAYMENT</code> in Payment Service $\rightarrow$ <code>CONFIRM_SEATS</code> upon successful payment webhook.
+            <br>2. <strong>Compensation Flow:</strong> If payment fails or the user cancels, the orchestrator triggers compensating actions in reverse order: <code>compensateCreatePayment</code> (initiates refund with idempotency key) $\rightarrow$ <code>compensateHoldSeats</code> (deletes segment locks and re-opens seats).
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Demonstrates advanced distributed systems design, CAP theorem understanding, and real-world failure recovery mechanisms.
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q3</span>
+          <span>How does your system allow one seat to be booked by passenger A from Station 1 to 3, and passenger B from Station 3 to 5 on the same train?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"By decoupling physical seats from journey segments using interval overlap algebra in a dedicated <code>seat_segment_locks</code> table."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            Every station along a route is assigned a sequential integer (<code>sequenceNumber</code>). When booking a segment from Station $A$ to Station $B$, two intervals $[fromSeq_1, toSeq_1]$ and $[fromSeq_2, toSeq_2]$ overlap <strong>if and only if</strong>:
+            <br><code>fromSeq_1 &lt; toSeq_2 AND toSeq_1 &gt; fromSeq_2</code>.
+          </p>
+          <p style="margin-top:0.5rem;">
+            Since $[1, 3]$ and $[3, 5]$ do not overlap ($1 &lt; 5$, but $3 \ngtr 3$), the query finds zero conflicting rows. Both passengers are successfully allocated the same physical seat number for different segments of the train's route!
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Shows mathematical problem solving applied to revenue optimization in transport and logistics domains.
+        </div>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q4</span>
+          <span>Why did you choose Apache Kafka over RabbitMQ or synchronous HTTP for notifications and inventory updates?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"For high-throughput log persistence, consumer decoupling, replayability, and independent consumer scaling."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            1. <strong>Non-Blocking User Experience:</strong> Sending emails via SMTP or third-party gateways (SendGrid) can take 1,500ms. With Kafka, the Booking Service emits <code>booking.confirmed</code> in 2ms and returns HTTP 200 immediately.
+            <br>2. <strong>Fan-out Architecture:</strong> When an Admin creates a schedule, both Inventory Service and Search Service consume the event simultaneously at their own processing speeds.
+            <br>3. <strong>Dead Letter Queues (DLQ):</strong> If a consumer crashes on a poison message, it routes to a DLQ after 3 retries without blocking partition offsets.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Demonstrates clear architectural trade-off analysis between message queuing (RabbitMQ) vs distributed event streaming (Kafka).
+        </div>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q5</span>
+          <span>How does your background seat lock expiration job run safely when you scale to 5 instances of Inventory Service?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Through non-blocking PostgreSQL session advisory locks: <code>SELECT pg_try_advisory_lock(800001)</code>."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            If 5 microservice instances run a cleanup cron every 15 seconds, having all 5 simultaneously execute <code>DELETE FROM seat_segment_locks WHERE lockExpiresAt &lt; NOW()</code> causes severe database row lock contention and duplicate Kafka event broadcasts.
+          </p>
+          <p style="margin-top:0.5rem;">
+            Using <code>pg_try_advisory_lock(800001)</code>, only the first instance that calls the query becomes the leader and obtains a lock. The other 4 instances receive <code>acquired = false</code> and exit immediately without querying seat tables.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Proves you design for horizontal scalability and distributed concurrency out-of-the-box.
+        </div>
+      </div>
+
+      <!-- Question 6 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q6</span>
+          <span>How does your authentication system prevent refresh token theft and replay attacks?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Through Refresh Token Rotation with single-use JTI tracking scoped to device IDs in Redis."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            When a user logs in, we generate a cryptographically random UUID <code>jti</code> and issue a signed Refresh Token. Redis stores <code>refresh:{userId}:{deviceId} -> jti</code> with a 7-day TTL.
+          </p>
+          <p style="margin-top:0.5rem;">
+            When the token is exchanged, we verify that the incoming JWT's <code>jti</code> matches Redis. If it matches, we immediately generate a brand-new <code>newJti</code> and overwrite Redis. If an attacker intercepts and attempts to reuse the previous refresh token, the <code>jti</code> will mismatch, and we immediately delete all sessions for that device, locking out the attacker!
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Demonstrates production-grade application security, OWASP guidelines, and token lifecycle management.
+        </div>
+      </div>
+
+      <!-- Question 7 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q7</span>
+          <span>Why did you bypass JSON body-parsing specifically for the Razorpay webhook route in the API Gateway?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Because cryptographic HMAC-SHA256 signature verification requires the exact raw byte stream from the HTTP request."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            Standard <code>express.json()</code> parses payloads into JavaScript objects. When re-stringifying them, differences in whitespace, line breaks, or key ordering break the signature check, leading to false "Invalid Webhook Signature" errors.
+          </p>
+          <p style="margin-top:0.5rem;">
+            In <code>api-gateway/src/index.js</code>, I added conditional middleware: if <code>req.path === '/api/payments/webhooks/razorpay'</code>, we invoke <code>express.raw({ type: 'application/json' })</code> to pass the unparsed buffer directly to the Payment Service for secure HMAC validation.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Shows deep practical experience with payment gateways, webhook security, and Node.js stream internals.
+        </div>
+      </div>
+
+      <!-- Question 8 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q8</span>
+          <span>How do you prevent counter drift between total seats, available seats, and booked seats under extreme concurrency?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"By deriving aggregate counts from actual seat row states using atomic SQL <code>COUNT(*) FILTER (WHERE status = ...)</code> queries inside the transaction."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            In high-throughput systems, using naive increment/decrement counters like <code>available = available - 1</code> leads to counter drift over time due to interrupted rollbacks, network timeouts, or unhandled exceptions.
+          </p>
+          <p style="margin-top:0.5rem;">
+            In <code>recountScheduleAggregates()</code>, we run a single atomic query across <code>seat_inventories</code>:
+            <br><code>SELECT COUNT(*) FILTER (WHERE status = 'AVAILABLE') AS available, COUNT(*) FILTER (WHERE status = 'LOCKED') AS locked, COUNT(*) FILTER (WHERE status = 'BOOKED') AS booked</code>.
+            <br>This guarantees that the schedule table is always an exact mathematical reflection of the underlying seat inventory rows.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Highlights database integrity discipline and understanding of defensive backend engineering.
+        </div>
+      </div>
+
+      <!-- Question 9 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q9</span>
+          <span>How does your Payment Service guarantee idempotency when Razorpay retries webhook deliveries?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"By recording the payment order event key in an atomic <code>idempotency_records</code> table before executing state mutations."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            Payment gateways retry webhook deliveries up to 5 times if their HTTP request times out. In <code>payment-service</code>, we construct a deterministic key <code>PAYMENT_SUCCESS:${gatewayPaymentId}</code>.
+          </p>
+          <p style="margin-top:0.5rem;">
+            Inside a PostgreSQL transaction, we attempt to insert this key with a unique constraint. If a duplicate delivery arrives, PostgreSQL throws a unique violation error, allowing us to immediately return an HTTP 200 OK to Razorpay without re-executing booking confirmations or re-firing Kafka events.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Proves you design for at-least-once distributed network deliveries and know how to prevent double credit/debit bugs.
+        </div>
+      </div>
+
+      <!-- Question 10 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q10</span>
+          <span>What happens if the Elasticsearch search cluster falls out of sync with the PostgreSQL master database?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"We treat PostgreSQL as the single source of truth and use dual recovery mechanisms: Kafka event re-sync and automated nightly re-indexing."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            Search Service listens to <code>inventory.seat-availability-updated</code> and <code>admin.schedule-created</code>. If Elasticsearch experiences network partitions or crashes:
+          </p>
+          <p style="margin-top:0.5rem;">
+            1. <strong>Kafka Consumer Offset Replay:</strong> We can rewind the consumer group offset for <code>search-service</code> to replay missed events from Kafka's 7-day retention log.
+            <br>2. <strong>Bulk Re-index Pipeline:</strong> An admin script runs a bulk read from Admin Service and re-indexes all active schedules into Elasticsearch with zero downtime using index aliases (blue/green index swapping).
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Highlights understanding of CQRS (Command Query Responsibility Segregation) and disaster recovery pipelines.
+        </div>
+      </div>
+
+      <!-- Question 11 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q11</span>
+          <span>How does the frontend render different coach berth types and manage responsive seat selection?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"By organizing seat matrices into coach bay units (Lower, Middle, Upper, Side Lower, Side Upper) driven by Zustand state management."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            In <code>SeatSelectionPage.jsx</code>, seats received from <code>inventory-service</code> contain metadata: <code>seatNumber</code>, <code>seatType</code>, <code>price</code>, and <code>status</code>.
+          </p>
+          <p style="margin-top:0.5rem;">
+            The UI organizes seats into traditional railway bays (6 main berths + 2 side berths per bay). Zustand tracks user selections in local state while enforcing validation (e.g. maximum 6 passengers per ticket, preventing selecting locked seats).
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Demonstrates full-stack capability: domain understanding translates directly into intuitive, high-performance UI rendering.
+        </div>
+      </div>
+
+      <!-- Question 12 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q12</span>
+          <span>How would you scale TrainTravel from 1,000 to 1,000,000 concurrent daily active users during festival bookings?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Through horizontal read replica scaling, Redis cluster caching, Kafka partition fan-out, and sharding schedules by train route."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            1. <strong>Read/Write Splitting:</strong> 95% of traffic during rush hours is route search and seat availability viewing. We route read queries to PostgreSQL read replicas and Elasticsearch clusters, reserving the primary database strictly for <code>FOR UPDATE NOWAIT</code> booking writes.
+            <br>2. <strong>Kafka Partitioning:</strong> Partition topics like <code>inventory.seat-availability-updated</code> by <code>scheduleId</code> to guarantee ordered seat updates while enabling parallel consumer scaling across multiple worker pods.
+            <br>3. <strong>Edge Rate Limiting:</strong> Deploy Cloudflare / AWS CloudFront at the edge to absorb DDoS attacks and cache static station autocomplete lists.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Shows visionary Staff/Principal Architect level capacity planning and cloud elasticity design.
+        </div>
+      </div>
+
+      <!-- Question 13 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q13</span>
+          <span>Why did you execute Lua scripts in Redis instead of standard Redis transactions (<code>MULTI / EXEC</code>) for multi-seat locking?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Because <code>MULTI / EXEC</code> cannot inspect intermediate state or branch conditionally, whereas Lua scripts execute atomically and can roll back mid-flight."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            In Redis, commands inside a <code>MULTI</code> block are queued and executed blindly. If you need to lock 4 seats for a family, you cannot check if Seat 3 is already occupied while processing Seat 2. If one seat is taken, standard commands would still lock the remaining three, leaving the user with an invalid partial reservation.
+          </p>
+          <p style="margin-top:0.5rem;">
+            In <code>booking-service/src/utils/distributedLock.js</code>, our Lua script runs atomically on Redis's single event loop. It loops over all seat keys: if any key already exists, it immediately unrolls all previously acquired keys in that exact execution and returns 0. Furthermore, we pre-sort seat IDs lexicographically (<code>[...seatIds].sort()</code>) to guarantee deterministic lock acquisition order, mathematically preventing circular wait deadlocks across concurrent requests!
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Demonstrates mastery of Redis internals, atomicity primitives, and fundamental distributed deadlock prevention.
+        </div>
+      </div>
+
+      <!-- Question 14 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q14</span>
+          <span>How does your background booking expiry worker prevent race conditions with a concurrent Razorpay payment confirmation webhook?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Through Optimistic Concurrency Control (CAS) using a monotonic <code>version</code> column on the Booking entity."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            Consider a dangerous race condition: A user completes payment at second 599. At second 600, Razorpay's webhook hits <code>payment-service</code>, while simultaneously the background expiry cron job in <code>booking-service</code> wakes up to clean bookings older than 10 minutes.
+          </p>
+          <p style="margin-top:0.5rem;">
+            To prevent cancelling a successfully paid ticket, <code>cleanExpiredBookings()</code> queries the booking with its current <code>version</code>, and performs an atomic Compare-And-Swap update:
+            <br><code>prisma.booking.updateMany({ where: { id: booking.id, version: booking.version, status: { in: ['PENDING', 'SEATS_HELD', 'PAYMENT_PENDING'] } }, data: { status: 'EXPIRED', version: { increment: 1 } } })</code>.
+            <br>If the payment webhook confirms first, it increments <code>version</code>. The expiry job's <code>claimed.count</code> evaluates to 0, causing it to safely back off without cancelling the booking or releasing the customer's seats!
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Shows deep experience with real-world financial transaction races, edge cases, and Optimistic Concurrency Control (OCC).
+        </div>
+      </div>
+
+      <!-- Question 15 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q15</span>
+          <span>How do you protect your email OTP authentication flow from side-channel timing attacks and brute-force harvesting?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"Through <code>crypto.timingSafeEqual()</code> on HMAC-SHA256 digests, multi-tier sliding rate limits, and Redis session TTLs."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            1. <strong>Timing Attack Immunity:</strong> Standard JavaScript string comparisons (<code>===</code>) short-circuit at the first non-matching byte. An adversary analyzing microsecond network jitter could progressively determine each digit of the OTP. In <code>user-service/src/utils/otp.js</code>, we compare HMAC digests using Node's native <code>crypto.timingSafeEqual()</code>, ensuring evaluation time is completely constant.
+            <br>2. <strong>Brute-Force Shielding:</strong> We enforce max 5 verification attempts per session (<code>otp:attempts:${email}</code>) and max 5 OTP generations per hour (<code>otp:rate:${email}</code>) using Redis counters.
+            <br>3. <strong>Client Fingerprinting:</strong> Sessions are bound to a 16-character SHA-256 hash of <code>User-Agent + Client-IP + Accept</code> headers to immediately detect hijacked session payloads.
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Highlights elite AppSec awareness, understanding of hardware/runtime timing leaks, and defense-in-depth API design.
+        </div>
+      </div>
+
+      <!-- Question 16 -->
+      <div class="qa-card">
+        <div class="qa-question">
+          <span class="qa-badge">Q16</span>
+          <span>How does the React frontend prevent token refresh stampedes when multiple parallel API queries fail simultaneously with 401 Unauthorized?</span>
+        </div>
+        <div class="qa-answer">
+          <p>
+            <strong>"By implementing an Axios response interceptor mutex that queues concurrent requests into a Promise array (<code>failedQueue</code>) while a single silent refresh takes place."</strong>
+          </p>
+          <p style="margin-top:0.5rem;">
+            When a user loads the dashboard, 4 components (User Profile, Active Bookings, Seat Availability, Search History) make simultaneous HTTP calls. If the access token has expired, all 4 return HTTP 401 simultaneously.
+          </p>
+          <p style="margin-top:0.5rem;">
+            In <code>frontend/src/api/client.js</code>, the first 401 acquires a mutex flag <code>isRefreshing = true</code> and initiates <code>POST /api/users/auth/refresh</code>. The remaining 3 failing requests are captured and pushed into <code>failedQueue</code> as unresolved Promise executors. Once the token refresh completes, <code>processQueue()</code> resolves the queue and seamlessly replays all original requests with the fresh token without any UI flicker or user re-login!
+          </p>
+        </div>
+        <div class="qa-pro-tip">
+          <span>INTERVIEWER IMPRESSION:</span> Demonstrates full-stack frontend engineering rigor, asynchronous Promise queue management, and flawless UX resilience.
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- ── SITE FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-brand">Suraj Kumar · Full-Stack Software Engineer</div>
+    <p class="footer-text">
+      TrainTravel · Distributed Microservices · Apache Kafka · Redis 7 Stack · PostgreSQL 15 · Elasticsearch 8 · Docker Compose.
+    </p>
+    <ul class="footer-links">
+      <li><a href="https://suraj-portfolio-io.vercel.app" target="_blank" rel="noopener">Suraj's Portfolio</a></li>
+      <li><a href="https://github.com/surajkumar11292/TrainTravel" target="_blank" rel="noopener">GitHub: TrainTravel</a></li>
+    </ul>
+  </footer>
+
+  <!-- ── INTERACTIVE JAVASCRIPT ── -->
+  <script>
+    // Theme Switcher Logic matching portfolio
+    const themeBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    const html = document.documentElement;
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Light';
+        localStorage.setItem('traintravel-guide-theme', 'dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        themeIcon.textContent = '🌙';
+        themeText.textContent = 'Dark';
+        localStorage.setItem('traintravel-guide-theme', 'light');
+      }
+    }
+
+    const savedTheme = localStorage.getItem('traintravel-guide-theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    function toggleModule(header) {
+      const parent = header.closest('.code-module');
+      parent.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
